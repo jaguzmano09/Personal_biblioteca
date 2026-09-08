@@ -41,7 +41,6 @@ export async function guardarLibro(
     .single()
 
   if (error) {
-    // El unique constraint (user_id, google_books_id) salta aquí si ya existe
     if (error.code === '23505') {
       throw new Error('Ya tienes este libro registrado en tu biblioteca.')
     }
