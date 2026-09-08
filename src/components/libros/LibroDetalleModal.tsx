@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Star, Trash2, Save } from 'lucide-react'
+import { Star, Save } from 'lucide-react'
 import { actualizarLibro, eliminarLibro } from '@/lib/libros'
 import type { Libro, EstadoLectura } from '@/lib/types'
 
@@ -50,36 +50,29 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
-      <div className="flex gap-6">
+      <div className="flex gap-6 pb-6 border-b border-rule">
         {libro.portada_url ? (
-          <img src={libro.portada_url} alt={libro.titulo} className="w-40 rounded-lg shadow" />
+          <img src={libro.portada_url} alt={libro.titulo} className="w-40 border border-rule" />
         ) : (
-          <div className="w-40 h-56 bg-gray-200 rounded-lg" />
+          <div className="w-40 h-56 bg-rule/20 border border-rule" />
         )}
 
         <div className="flex-1">
-          <h1 className="text-2xl font-bold">{libro.titulo}</h1>
-          <p className="text-gray-500">{libro.autores?.join(', ')}</p>
+          <h1 className="font-display text-3xl leading-tight">{libro.titulo}</h1>
+          <p className="font-mono text-sm text-ink/60 mt-2">{libro.autores?.join(', ')}</p>
           {libro.editorial && (
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="font-mono text-xs text-ink/40 mt-1">
               {libro.editorial} {libro.fecha_publicacion && `· ${libro.fecha_publicacion}`}
-              {libro.paginas && ` · ${libro.paginas} páginas`}
+              {libro.paginas && ` · ${libro.paginas}p`}
             </p>
           )}
 
-          <div className="flex gap-2 mt-4">
-            <button
-              onClick={() => setEditando(!editando)}
-              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
-            >
-              {editando ? 'Cancelar edición' : 'Editar'}
+          <div className="flex gap-2 mt-4 font-mono text-xs">
+            <button onClick={() => setEditando(!editando)} className="border border-ink px-3 py-1.5 hover:bg-ink hover:text-paper transition-colors">
+              {editando ? 'cancelar' : 'editar'}
             </button>
-            <button
-              onClick={handleEliminar}
-              disabled={eliminando}
-              className="flex items-center gap-1 px-3 py-1.5 border border-red-300 text-red-600 rounded-lg text-sm hover:bg-red-50 disabled:opacity-50"
-            >
-              <Trash2 className="w-3.5 h-3.5" /> {eliminando ? 'Eliminando...' : 'Eliminar'}
+            <button onClick={handleEliminar} disabled={eliminando} className="border border-stamp text-stamp px-3 py-1.5 hover:bg-stamp hover:text-paper transition-colors disabled:opacity-50">
+              {eliminando ? 'eliminando...' : 'eliminar'}
             </button>
           </div>
         </div>
