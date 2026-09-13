@@ -2,11 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Star, Save } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowLeft, Star, Save } from 'lucide-react'
 import { actualizarLibro, eliminarLibro } from '@/lib/libros'
-import type { Libro, EstadoLectura } from '@/lib/types'
+import type { Libro, EstadoLectura, FormatoLectura, ProcedenciaLibro } from '@/lib/types'
 
 const ESTADOS: EstadoLectura[] = ['Pendiente', 'Leyendo', 'Leído', 'Abandonado']
+const FORMATOS: FormatoLectura[] = ['Física', 'Digital']
+const PROCEDENCIAS: ProcedenciaLibro[] = ['Casa de mis papás', 'Regalado', 'Comprado']
 
 export default function LibroDetalleModal({ libro }: { libro: Libro }) {
   const router = useRouter()
@@ -19,6 +22,10 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
   const [resumenAnalisis, setResumenAnalisis] = useState(libro.resumen_analisis ?? '')
   const [personajeFavorito, setPersonajeFavorito] = useState(libro.personaje_favorito ?? '')
   const [citasDestacadas, setCitasDestacadas] = useState(libro.citas_destacadas ?? '')
+  const [anioLectura, setAnioLectura] = useState(libro.anio_lectura?.toString() ?? '')
+  const [mesLectura, setMesLectura] = useState(libro.mes_lectura?.toString() ?? '')
+  const [formato, setFormato] = useState<FormatoLectura | ''>(libro.formato ?? '')
+  const [procedencia, setProcedencia] = useState<ProcedenciaLibro | ''>(libro.procedencia ?? '')
 
   async function handleGuardar() {
     setGuardando(true)
@@ -29,6 +36,10 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
         resumen_analisis: resumenAnalisis || null,
         personaje_favorito: personajeFavorito || null,
         citas_destacadas: citasDestacadas || null,
+        anio_lectura: anioLectura ? Number(anioLectura) : null,
+        mes_lectura: anioLectura && mesLectura ? Number(mesLectura) : null,
+        formato: formato || null,
+        procedencia: procedencia || null,
       })
       setEditando(false)
       router.refresh()
@@ -50,6 +61,13 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
+      <Link
+        href="/biblioteca"
+        className="inline-flex items-center gap-1.5 font-mono text-xs text-ink/60 hover:text-cloth-dark mb-6"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" /> volver a la biblioteca
+      </Link>
+
       <div className="flex gap-6 pb-6 border-b border-rule">
         {libro.portada_url ? (
           <img src={libro.portada_url} alt={libro.titulo} className="w-40 border border-rule" />
@@ -101,6 +119,51 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Formato</label>
+                <select
+                  value={formato}
+                  onChange={e => setFormato(e.target.value as FormatoLectura)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                >
+                  <option value="">Sin especificar</option>
+                  {FORMATOS.map(f => <option key={f} value={f}>{f}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Procedencia</label>
+                <select
+                  value={procedencia}
+                  onChange={e => setProcedencia(e.target.value as ProcedenciaLibro)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                >
+                  <option value="">Sin especificar</option>
+                  {PROCEDENCIAS.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Año de lectura</label>
+                <input
+                  type="number"
+                  value={anioLectura}
+                  onChange={e => setAnioLectura(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Mes de lectura</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="12"
+                  value={mesLectura}
+                  onChange={e => setMesLectura(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                />
+              </div>
             </div>
 
             <div>
@@ -148,6 +211,19 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
                 <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                 <span className="font-medium">{libro.puntuacion} / 10</span>
               </div>
+            )}
+            {libro.anio_lectura && (
+              <p className="font-mono text-sm">
+                <span className="font-medium not-mono">Leído en:</span>{' '}
+                {libro.mes_lectura
+                  ? new Date(2000, libro.mes_lectura - 1).toLocaleDateString('es', { month: 'long' }) + ' de ' + libro.anio_lectura
+                  : libro.anio_lectura}
+              </p>
+            )}
+            {(libro.formato || libro.procedencia) && (
+              <p className="font-mono text-sm text-ink/70">
+                {[libro.formato, libro.procedencia].filter(Boolean).join(' · ')}
+              </p>
             )}
             {libro.personaje_favorito && (
               <p><span className="font-medium">Personaje favorito:</span> {libro.personaje_favorito}</p>

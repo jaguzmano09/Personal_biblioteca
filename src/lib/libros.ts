@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import type { GoogleBookResult, Libro, EstadoLectura } from '@/lib/types'
+import type { GoogleBookResult, Libro, EstadoLectura,FormatoLectura, ProcedenciaLibro } from '@/lib/types'
 import { revalidatePath } from 'next/cache'
 
 interface DatosPersonales {
@@ -10,8 +10,10 @@ interface DatosPersonales {
   resumen_analisis?: string | null
   personaje_favorito?: string | null
   citas_destacadas?: string | null
-  fecha_inicio?: string | null
-  fecha_fin?: string | null
+  anio_lectura?: number | null
+  mes_lectura?: number | null
+  formato?: FormatoLectura | null
+  procedencia?: ProcedenciaLibro | null
 }
 
 export async function guardarLibro(

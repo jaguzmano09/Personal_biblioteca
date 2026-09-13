@@ -1,4 +1,6 @@
 export type EstadoLectura = 'Leído' | 'Leyendo' | 'Pendiente' | 'Abandonado'
+export type FormatoLectura = 'Física' | 'Digital'
+export type ProcedenciaLibro = 'Casa de mis papás' | 'Regalado' | 'Comprado'
 
 export interface Libro {
   id: string
@@ -16,8 +18,10 @@ export interface Libro {
   resumen_analisis: string | null
   personaje_favorito: string | null
   citas_destacadas: string | null
-  fecha_inicio: string | null
-  fecha_fin: string | null
+  anio_lectura: number | null
+  mes_lectura: number | null
+  formato: FormatoLectura | null
+  procedencia: ProcedenciaLibro | null
   created_at: string
   updated_at: string
 }

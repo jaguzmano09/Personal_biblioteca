@@ -1,11 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import type { GoogleBookResult, EstadoLectura } from '@/lib/types'
 import { guardarLibro } from '@/lib/libros'
 import { useRouter } from 'next/navigation'
+import type { GoogleBookResult, EstadoLectura, FormatoLectura, ProcedenciaLibro } from '@/lib/types'
+
 
 const ESTADOS: EstadoLectura[] = ['Pendiente', 'Leyendo', 'Leído', 'Abandonado']
+const FORMATOS: FormatoLectura[] = ['Física', 'Digital']
+const PROCEDENCIAS: ProcedenciaLibro[] = ['Casa de mis papás', 'Regalado', 'Comprado']
+
 
 interface Props {
   libroSeleccionado: GoogleBookResult
@@ -22,8 +26,10 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
   const [personajeFavorito, setPersonajeFavorito] = useState('')
   const [resumenAnalisis, setResumenAnalisis] = useState('')
   const [citasDestacadas, setCitasDestacadas] = useState('')
-  const [fechaInicio, setFechaInicio] = useState('')
-  const [fechaFin, setFechaFin] = useState('')
+  const [anioLectura, setAnioLectura] = useState('')
+  const [mesLectura, setMesLectura] = useState('')
+  const [formato, setFormato] = useState<FormatoLectura | ''>('')
+  const [procedencia, setProcedencia] = useState<ProcedenciaLibro | ''>('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -37,8 +43,10 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
         personaje_favorito: personajeFavorito || null,
         resumen_analisis: resumenAnalisis || null,
         citas_destacadas: citasDestacadas || null,
-        fecha_inicio: fechaInicio || null,
-        fecha_fin: fechaFin || null,
+        anio_lectura: anioLectura ? Number(anioLectura) : null,
+        mes_lectura: anioLectura && mesLectura ? Number(mesLectura) : null,
+        formato: formato || null,
+        procedencia: procedencia || null,
       })
       router.push('/biblioteca')
     } catch (err) {
@@ -102,23 +110,66 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Fecha inicio</label>
+          <label className="block text-sm font-medium mb-1">Formato</label>
+          <select
+            value={formato}
+            onChange={e => setFormato(e.target.value as FormatoLectura)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+          >
+            <option value="">Sin especificar</option>
+            {FORMATOS.map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Procedencia</label>
+          <select
+            value={procedencia}
+            onChange={e => setProcedencia(e.target.value as ProcedenciaLibro)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+          >
+            <option value="">Sin especificar</option>
+            {PROCEDENCIAS.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Año de lectura</label>
           <input
-            type="date"
-            value={fechaInicio}
-            onChange={e => setFechaInicio(e.target.value)}
+            type="number"
+            placeholder="Ej: 2024"
+            min="1000"
+            max="9999"
+            value={anioLectura}
+            onChange={e => setAnioLectura(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Fecha fin</label>
-          <input
-            type="date"
-            value={fechaFin}
-            onChange={e => setFechaFin(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
+          <label className="block text-sm font-medium mb-1">
+            Mes <span className="text-gray-400 font-normal">(opcional)</span>
+          </label>
+          <select
+            value={mesLectura}
+            onChange={e => setMesLectura(e.target.value)}
+            disabled={!anioLectura}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 disabled:bg-gray-100 disabled:text-gray-400"
+          >
+            <option value="">No recuerdo el mes</option>
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8">Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
         </div>
       </div>
 
