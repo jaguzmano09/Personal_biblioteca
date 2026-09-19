@@ -1,9 +1,15 @@
 import Link from 'next/link'
 import { obtenerLibros } from '@/lib/libros'
+import { obtenerMeta } from '@/lib/metas'
 import LibrosGrid from '@/components/libros/LibrosGrid'
+import EstadisticasDashboard from '@/components/libros/EstadisticasDashboard'
 
 export default async function BibliotecaPage() {
-  const libros = await obtenerLibros()
+  const anioActual = new Date().getFullYear()
+  const [libros, meta] = await Promise.all([
+    obtenerLibros(),
+    obtenerMeta(anioActual),
+  ])
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-4 sm:px-6">
@@ -21,6 +27,8 @@ export default async function BibliotecaPage() {
           + Agregar libro
         </Link>
       </div>
+
+      <EstadisticasDashboard libros={libros} metaInicial={meta} anioActual={anioActual} />
 
       <LibrosGrid libros={libros} />
     </div>

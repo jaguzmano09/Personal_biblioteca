@@ -30,6 +30,7 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
   const [mesLectura, setMesLectura] = useState('')
   const [formato, setFormato] = useState<FormatoLectura | ''>('')
   const [procedencia, setProcedencia] = useState<ProcedenciaLibro | ''>('')
+  const [portadaUrl, setPortadaUrl] = useState(libroSeleccionado.portada_url ?? '')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -37,17 +38,20 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
     setError(null)
 
     try {
-      await guardarLibro(libroSeleccionado, {
-        estado,
-        puntuacion: puntuacion ? Number(puntuacion) : null,
-        personaje_favorito: personajeFavorito || null,
-        resumen_analisis: resumenAnalisis || null,
-        citas_destacadas: citasDestacadas || null,
-        anio_lectura: anioLectura ? Number(anioLectura) : null,
-        mes_lectura: anioLectura && mesLectura ? Number(mesLectura) : null,
-        formato: formato || null,
-        procedencia: procedencia || null,
-      })
+      await guardarLibro(
+        { ...libroSeleccionado, portada_url: portadaUrl || null },
+        {
+          estado,
+          puntuacion: puntuacion ? Number(puntuacion) : null,
+          personaje_favorito: personajeFavorito || null,
+          resumen_analisis: resumenAnalisis || null,
+          citas_destacadas: citasDestacadas || null,
+          anio_lectura: anioLectura ? Number(anioLectura) : null,
+          mes_lectura: anioLectura && mesLectura ? Number(mesLectura) : null,
+          formato: formato || null,
+          procedencia: procedencia || null,
+        }
+      )
       router.push('/biblioteca')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar el libro')
@@ -80,6 +84,19 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
             Cambiar libro
           </button>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">
+          URL de portada <span className="text-gray-400 font-normal">(opcional, sobreescribe la de Google Books)</span>
+        </label>
+        <input
+          type="url"
+          placeholder="https://..."
+          value={portadaUrl}
+          onChange={e => setPortadaUrl(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2"
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-4">

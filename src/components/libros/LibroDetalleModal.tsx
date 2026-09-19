@@ -26,6 +26,7 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
   const [mesLectura, setMesLectura] = useState(libro.mes_lectura?.toString() ?? '')
   const [formato, setFormato] = useState<FormatoLectura | ''>(libro.formato ?? '')
   const [procedencia, setProcedencia] = useState<ProcedenciaLibro | ''>(libro.procedencia ?? '')
+  const [portadaUrl, setPortadaUrl] = useState(libro.portada_url ?? '')
 
   async function handleGuardar() {
     setGuardando(true)
@@ -40,6 +41,7 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
         mes_lectura: anioLectura && mesLectura ? Number(mesLectura) : null,
         formato: formato || null,
         procedencia: procedencia || null,
+        portada_url: portadaUrl || null,
       })
       setEditando(false)
       router.refresh()
@@ -99,6 +101,16 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
       <div className="mt-8 space-y-4">
         {editando ? (
           <>
+            <div>
+              <label className="block text-sm font-medium mb-1">URL de portada</label>
+              <input
+                type="url"
+                value={portadaUrl}
+                onChange={e => setPortadaUrl(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Estado</label>
