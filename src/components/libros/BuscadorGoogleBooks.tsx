@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { Search, Loader2 } from 'lucide-react'
-import { buscarLibros } from '@/lib/googleBooks'
 import { useDebounce } from '@/hooks/useDebounce'
 import type { GoogleBookResult } from '@/lib/types'
 
@@ -28,8 +27,13 @@ export default function BuscadorGoogleBooks({ onSeleccionar }: Props) {
     setCargando(true)
     setError(null)
 
-    buscarLibros(debouncedQuery)
-      .then(libros => {
+    fetch(`/api/google-books?q=${encodeURIComponent(debouncedQuery)}&maxResults=10`)
+      .then(async res => {
+        if (!res.ok) {
+          throw new Error('Error al consultar Google Books')
+        }
+
+        const libros = await res.json() as GoogleBookResult[]
         if (!cancelado) setResultados(libros)
       })
       .catch(() => {
