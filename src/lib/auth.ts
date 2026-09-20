@@ -17,7 +17,7 @@ export async function iniciarSesion(email: string, password: string) {
 
 export async function registrarUsuario(email: string, password: string) {
   const supabase = await createClient()
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const siteUrl = process.env.SITE_URL || 'http://localhost:3000'
 
   const { error } = await supabase.auth.signUp({
     email,

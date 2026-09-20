@@ -41,7 +41,7 @@ export async function buscarLibros(query: string): Promise<GoogleBookResult[]> {
   })
 
   // Agregamos la key si existe, para evitar la cuota anónima compartida
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_BOOKS_API_KEY
+  const apiKey = process.env.GOOGLE_BOOKS_API_KEY
   if (apiKey) {
     params.set('key', apiKey)
   }
