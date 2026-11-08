@@ -4,10 +4,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { iniciarSesion } from '@/lib/auth'
 
-export default function LoginForm() {
+export default function LoginForm({ confirmationError = false }: { confirmationError?: boolean }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(confirmationError ? 'El enlace de confirmación no es válido o ha caducado.' : null)
   const [cargando, setCargando] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -15,11 +15,11 @@ export default function LoginForm() {
     setCargando(true)
     setError(null)
 
-    const resultado = await iniciarSesion(email, password)
-    if (resultado?.error) {
-      setError(resultado.error)
-      setCargando(false)
-    }
+    try {
+      const resultado = await iniciarSesion(email, password)
+      if (resultado?.error) setError(resultado.error)
+    } catch { setError('No se pudo iniciar sesión. Inténtalo de nuevo.') }
+    finally { setCargando(false) }
   }
 
   return (
@@ -32,9 +32,11 @@ export default function LoginForm() {
 
         <form onSubmit={handleSubmit} className="space-y-5 p-6 sm:p-8">
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-[#2b2a24]">Email</label>
-            <input
+            <label htmlFor="loginform-1" className="block text-sm font-medium text-[#2b2a24]">Email</label>
+            <input id="loginform-1"
               type="email"
+              autoComplete="email"
+              maxLength={254}
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -44,9 +46,10 @@ export default function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-[#2b2a24]">Contraseña</label>
-            <input
+            <label htmlFor="loginform-2" className="block text-sm font-medium text-[#2b2a24]">Contraseña</label>
+            <input id="loginform-2"
               type="password"
+              autoComplete="current-password"
               required
               value={password}
               onChange={e => setPassword(e.target.value)}
@@ -56,7 +59,7 @@ export default function LoginForm() {
           </div>
 
           {error && (
-            <div className="rounded-xl border border-[#a63d33]/30 bg-[#a63d33]/8 px-3 py-2 text-sm text-[#7a2f2a]">
+            <div role="alert" className="rounded-xl border border-[#a63d33]/30 bg-[#a63d33]/8 px-3 py-2 text-sm text-[#7a2f2a]">
               {error}
             </div>
           )}

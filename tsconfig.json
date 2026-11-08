@@ -8,14 +8,16 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
     "esModuleInterop": true,
     "moduleResolution": "bundler",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -24,7 +26,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "allowImportingTsExtensions": true
   },
   "include": [
     "next-env.d.ts",

@@ -6,6 +6,7 @@ import FiltrosOrdenamiento, { Ordenamiento } from './FiltrosOrdenamiento'
 import type { Libro, EstadoLectura, ProcedenciaLibro } from '@/lib/types'
 
 export default function LibrosGrid({ libros }: { libros: Libro[] }) {
+  const [pagina, setPagina] = useState(1)
   const [busqueda, setBusqueda] = useState('')
   const [estadoFiltro, setEstadoFiltro] = useState<EstadoLectura | 'Todos'>('Todos')
   const [anioFiltro, setAnioFiltro] = useState('Todos')
@@ -34,7 +35,7 @@ export default function LibrosGrid({ libros }: { libros: Libro[] }) {
     }
 
     if (busqueda.trim()) {
-      const q = busqueda.toLowerCase()
+      const q = busqueda.trim().toLocaleLowerCase('es')
       resultado = resultado.filter(l =>
         l.titulo.toLowerCase().includes(q) ||
         l.autores?.some(a => a.toLowerCase().includes(q))
@@ -50,6 +51,8 @@ export default function LibrosGrid({ libros }: { libros: Libro[] }) {
     return resultado
   }, [libros, busqueda, estadoFiltro, anioFiltro, procedenciaFiltro, orden])
 
+  const visibles = librosFiltrados.slice(0, pagina * 50)
+
   return (
     <div>
       <FiltrosOrdenamiento
@@ -62,7 +65,7 @@ export default function LibrosGrid({ libros }: { libros: Libro[] }) {
 
       {anioFiltro !== 'Todos' && (
         <p className="text-sm text-gray-500 mb-4">
-          {librosFiltrados.length} {librosFiltrados.length === 1 ? 'libro leído' : 'libros leídos'} en {anioFiltro}
+          {librosFiltrados.length} {librosFiltrados.length === 1 ? 'libro registrado' : 'libros registrados'} en {anioFiltro}
         </p>
       )}
 
@@ -70,11 +73,12 @@ export default function LibrosGrid({ libros }: { libros: Libro[] }) {
         <p className="text-center text-gray-400 py-12">No se encontraron libros.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {librosFiltrados.map(libro => (
+          {visibles.map(libro => (
             <LibroCard key={libro.id} libro={libro} />
           ))}
         </div>
       )}
+      {visibles.length < librosFiltrados.length && <button type="button" className="border px-4 py-2 mt-4" onClick={() => setPagina(p => p + 1)}>Mostrar más libros</button>}
     </div>
   )
 }
