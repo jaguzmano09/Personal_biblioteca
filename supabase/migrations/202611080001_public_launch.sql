@@ -45,9 +45,7 @@ alter table public.libros add constraint libros_values_valid check (
   (procedencia is null or procedencia in ('Casa de mis papás', 'Regalado', 'Comprado')) and
   (resumen_analisis is null or length(resumen_analisis) <= 20000) and
   (citas_destacadas is null or length(citas_destacadas) <= 20000) and
-  (personaje_favorito is null or length(personaje_favorito) <= 500) and
-  (portada_url is null or (length(portada_url) <= 2048 and
-    portada_url ~ '^https://(books\.google\.com|books\.googleusercontent\.com|covers\.openlibrary\.org)/'))
+  (personaje_favorito is null or length(personaje_favorito) <= 500)
 );
 alter table public.metas_lectura add constraint metas_values_valid check (
   anio between 1000 and 9999 and meta_libros between 1 and 100000

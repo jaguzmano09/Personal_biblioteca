@@ -63,13 +63,14 @@ Never use `service_role` or an `sb_secret_` key in this application. Privileged 
 
 The schema and authorization rules are versioned in:
 
-[`supabase/migrations/202611080001_public_launch.sql`](supabase/migrations/202611080001_public_launch.sql)
+1. [`202611080001_public_launch.sql`](supabase/migrations/202611080001_public_launch.sql) — base schema and account isolation.
+2. [`202611080002_manual_covers.sql`](supabase/migrations/202611080002_manual_covers.sql) — provider-independent cover storage and authenticated image-proxy quota.
 
-This migration supports a new project or the existing `libros`/`metas_lectura` schema documented by the original project. It is a **one-time migration**, not a script to repeatedly paste into production.
+The initial migration supports a new project or the existing `libros`/`metas_lectura` schema documented by the original project. It is a **one-time migration**, not a script to repeatedly paste into production.
 
 1. Back up the existing database and test the migration on a staging copy.
-2. Inspect legacy rows for duplicate `(user_id, google_books_id)` pairs, orphaned owners, invalid scores/dates, unsupported cover URLs and oversized text. Resolve them deliberately before migrating. No records are automatically deleted or rewritten to pass validation.
-3. Run the SQL file in the Supabase SQL Editor as the database owner. Alternatively, apply it using your established Supabase CLI migration workflow. This repository does not contain a linked CLI project configuration.
+2. Inspect legacy rows for duplicate `(user_id, google_books_id)` pairs, orphaned owners, invalid scores/dates and oversized text. Resolve them deliberately before migrating. No records or stored cover URLs are deleted or rewritten to pass validation.
+3. Run both SQL files **in order** in the Supabase SQL Editor as the database owner. If the original 001 failed on `libros_values_valid`, issue `ROLLBACK`, retry the corrected 001 from this revision, then run 002. If 001 already completed successfully, run only 002. Alternatively, apply it using your established Supabase CLI migration workflow. This repository does not contain a linked CLI project configuration.
 4. Confirm the transaction committed successfully and the new policies, constraints and `consume_book_search()` function exist.
 5. Deploy the matching application code **after** the migration.
 6. Test with two real accounts and an anonymous client as described in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
@@ -98,7 +99,9 @@ Book updates accept only the personal reading fields and the cover URL. Submitte
 
 Google Books search requires authentication. Each account can make **20 searches per minute**, with a maximum of 20 results and query length of 2–200 characters. The quota is stored in PostgreSQL, not process memory, and search fails closed if the limiter is unavailable. Upstream requests time out after eight seconds. This is an account-level control; configure edge-level abuse protection and Google quota limits before launch.
 
-Cover images are restricted to HTTPS on `books.google.com`, `books.googleusercontent.com` and `covers.openlibrary.org`. Existing unsupported URLs are not rendered; the migration requires correcting/removing them first. Image requests omit the referrer, but their providers still receive the visitor's IP. Google receives book-search queries from the server. Supabase and the hosting provider process authentication/application traffic. Personal reviews and quotations are not sent to Google Books.
+Manual cover URLs can point to any public image provider, including Google image thumbnails on `encrypted-tbn0.gstatic.com`. Stored URLs remain unchanged. New URLs must use HTTP/HTTPS without embedded credentials or nonstandard ports. All rendered covers use the authenticated `/api/covers` endpoint: the visitor's browser contacts this application, and the application retrieves the image. Providers receive the server's IP rather than the visitor's IP; no visitor cookies or referrer are forwarded. The image itself is re-encoded as JPEG without original metadata; the stored original URL is preserved.
+
+The proxy checks all resolved IP addresses and each redirect, blocks internal/special destinations, and pins outbound connections to a vetted IP while preserving the original Host/TLS name. Downloads are limited to 5 MiB, eight seconds and three redirects; JPEG/PNG/WebP/GIF input is decoded within a 16-million-pixel limit and a three-second processing timeout. HTML, SVG and other unsupported content are rejected. Images are resized to fit 800 × 1200 and served as private, noncached JPEG responses. There is a separate shared quota of 120 image requests per account per minute. Unsupported/unavailable images fail without changing the stored URL. External links can expire or block server downloads; use direct image URLs rather than webpage/search-result URLs. Google receives book-search queries from the server. Supabase and the hosting provider process authentication/application traffic. Personal reviews and quotations are not sent to Google Books.
 
 Security headers disable framing, MIME sniffing, camera/microphone/location permissions and referrer disclosure. The CSP currently restricts framing, objects, base URLs and form destinations; it is **not a complete nonce-based script CSP**.
 
@@ -113,6 +116,7 @@ src/
     (protected)/biblioteca/    Catalog, add-book and detail pages
     api/auth/callback/         Email confirmation callback
     api/google-books/          Authenticated, rate-limited search
+    api/covers/                Authenticated image intermediary
   components/
     auth/                      Authentication forms
     libros/                    Catalog, dashboard and reading forms
@@ -125,7 +129,8 @@ src/
     validation.ts              Runtime input validation and field allowlists
     statistics.ts              Completed-reading calculations
     googleBooks.ts             Single external metadata integration
-    covers.ts                  Safe cover rendering
+    covers.ts                  Same-origin image URLs
+    cover-proxy.ts             SSRF-protected fetching and raster re-encoding
     supabase/                  Server client and configuration
   proxy.ts                     Session refresh and navigation protection
 supabase/migrations/           PostgreSQL schema, RLS, triggers and search quota

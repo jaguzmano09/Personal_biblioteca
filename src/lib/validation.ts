@@ -30,14 +30,13 @@ export function uuid(value: unknown): string {
   return value
 }
 export function coverUrl(value: unknown): string | null {
-  const result = text(value, 2048)
+  const result = text(value, 8192)
   if (!result) return null
   let url: URL
   try { url = new URL(result) } catch { throw invalid() }
-  // External images disclose the visitor's IP to their host. Only supported cover providers are allowed.
-  if (url.protocol !== 'https:' || url.username || url.password || url.port ||
-      !['books.google.com', 'books.googleusercontent.com', 'covers.openlibrary.org'].includes(url.hostname)) throw invalid()
-  return url.href
+  // Storage is provider-independent. Network destinations are verified by the server proxy.
+  if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password || url.port || !url.hostname) throw invalid()
+  return result
 }
 export type PersonalData = Pick<Libro, 'estado' | 'puntuacion' | 'resumen_analisis' | 'personaje_favorito' | 'citas_destacadas' | 'anio_lectura' | 'mes_lectura' | 'formato' | 'procedencia'>
 export type BookChanges = PersonalData & Pick<Libro, 'portada_url'>

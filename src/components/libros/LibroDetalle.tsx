@@ -120,7 +120,7 @@ export default function LibroDetalle({ libro }: { libro: Libro }) {
         {editando ? (
           <>
             <div>
-              <label htmlFor="librodetallemodal-1" className="block text-sm font-medium mb-1">URL de portada (Google Books u Open Library, HTTPS)</label>
+              <label htmlFor="librodetallemodal-1" className="block text-sm font-medium mb-1">URL de portada (enlace directo a una imagen)</label>
               <input id="librodetallemodal-1"
                 type="url"
                 value={portadaUrl}

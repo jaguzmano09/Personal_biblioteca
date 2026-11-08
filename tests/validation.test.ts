@@ -20,10 +20,13 @@ test('invalid ranges and field types are rejected at runtime', () => {
   for (const value of [0, 1.5, Infinity, '5']) assert.throws(() => integer(value, 1, 100000))
   assert.throws(() => uuid('not-a-uuid'))
 })
-test('covers reject tracking hosts, credentials, protocol and hostname tricks', () => {
+test('manual covers accept arbitrary image providers while rejecting unsafe URL syntax', () => {
   assert.equal(coverUrl('https://books.google.com/books?id=123'), 'https://books.google.com/books?id=123')
-  for (const url of ['http://books.google.com/x', 'https://books.google.com.evil.test/x',
-    'https://evil.test/pixel', 'https://user@books.google.com/x', 'javascript:alert(1)',
+  const manual = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:example&s=10'
+  assert.equal(coverUrl(manual), manual)
+  assert.equal(coverUrl('https://other-provider.example/cover.jpg'), 'https://other-provider.example/cover.jpg')
+  assert.equal(coverUrl('http://other-provider.example/cover.jpg'), 'http://other-provider.example/cover.jpg')
+  for (const url of ['https://user@books.google.com/x', 'javascript:alert(1)',
     'https://books.google.com:444/x', 'data:image/png;base64,x']) assert.throws(() => coverUrl(url))
 })
 test('book metadata is validated and only explicit fields are retained', () => {

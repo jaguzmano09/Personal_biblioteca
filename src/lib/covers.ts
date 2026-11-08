@@ -1,4 +1,7 @@
 import { coverUrl } from './validation'
 export function safeCover(value: unknown) {
-  try { return coverUrl(value) } catch { return null }
+  try {
+    const source = coverUrl(value)
+    return source ? `/api/covers?url=${encodeURIComponent(source)}` : null
+  } catch { return null }
 }
