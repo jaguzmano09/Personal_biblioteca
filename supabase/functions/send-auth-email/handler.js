@@ -76,9 +76,16 @@ export function createHandler({ verify, config, fetchImpl = fetch, log = console
           body: JSON.stringify(message),
         })
         if (!response.ok) {
-          // Status identifies authentication/quota/provider failures without disclosing the email or tokens.
-          log(JSON.stringify({ event: 'brevo_send_failed', status: response.status }))
-          await response.body?.cancel()
+          let brevoCode = 'unknown'
+          try {
+            const errorData = await response.json()
+            if (typeof errorData?.code === 'string' && /^[a-zA-Z0-9_-]{1,64}$/.test(errorData.code)) {
+              brevoCode = errorData.code
+            }
+          } catch {
+            // Brevo did not return valid JSON.
+          }
+          log(JSON.stringify({ event: 'brevo_send_failed', status: response.status, brevo_code: brevoCode }))
           return failure(502, 'Email provider rejected the request')
         }
         await response.body?.cancel()
