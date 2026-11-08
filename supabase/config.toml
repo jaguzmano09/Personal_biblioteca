@@ -1,0 +1,5 @@
+# This function authenticates Supabase Auth requests using Standard Webhooks signatures.
+# It must not require a user JWT: Auth hooks do not send one.
+[functions.send-auth-email]
+verify_jwt = false
+entrypoint = "./functions/send-auth-email/index.js"

@@ -153,6 +153,10 @@ These checks do not replace staging tests against Supabase Auth, PostgREST and y
 
 ## Deployment
 
+For optional authentication email delivery through the Brevo HTTP API instead of SMTP, see
+[`docs/BREVO_API.md`](docs/BREVO_API.md). The function and signed Auth hook require separate
+Supabase deployment/configuration; merging this repository does not activate email delivery.
+
 Use a Node-compatible Next.js host such as Vercel. Configure server environment variables, apply the migration, and configure Supabase Auth's Site URL and exact confirmation callback URL:
 
 ```text
