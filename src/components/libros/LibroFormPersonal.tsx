@@ -89,7 +89,7 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
 
       <div>
         <label htmlFor="libroformpersonal-1" className="block text-sm font-medium mb-1">
-          URL de portada (Google Books u Open Library, HTTPS) <span className="text-gray-400 font-normal">(opcional)</span>
+          URL de portada (enlace directo a una imagen) <span className="text-gray-400 font-normal">(opcional)</span>
         </label>
         <input id="libroformpersonal-1"
           type="url"

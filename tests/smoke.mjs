@@ -28,6 +28,9 @@ try {
     assert.equal(new URL(response.headers.get('location'), origin).pathname, '/login')
     assert.match(response.headers.get('cache-control'), /no-store/)
   }
+  const cover = await fetch(`${origin}/api/covers?url=https://example.com/cover.png`)
+  assert.equal(cover.status, 401)
+  assert.match(cover.headers.get('cache-control'), /no-store/)
   const search = await fetch(`${origin}/api/google-books?q=test`)
   assert.equal(search.status, 401)
   assert.match(search.headers.get('cache-control'), /no-store/)

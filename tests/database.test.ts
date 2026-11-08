@@ -3,7 +3,9 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { PGlite } from '@electric-sql/pglite'
 
-const migration = await readFile(new URL('../supabase/migrations/202611080001_public_launch.sql', import.meta.url), 'utf8')
+const initialMigration = await readFile(new URL('../supabase/migrations/202611080001_public_launch.sql', import.meta.url), 'utf8')
+const coverMigration = await readFile(new URL('../supabase/migrations/202611080002_manual_covers.sql', import.meta.url), 'utf8')
+const migration = initialMigration + '\n' + coverMigration
 const A = '11111111-1111-4111-8111-111111111111'
 const B = '22222222-2222-4222-8222-222222222222'
 const book = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
@@ -58,7 +60,6 @@ test('PostgreSQL enforces ownership, constraints and shared search quotas', asyn
         `update public.libros set user_id='${B}'`, `update public.libros set id=gen_random_uuid()`,
         `update public.metas_lectura set user_id='${B}'`, `update public.metas_lectura set anio=2027`,
         `update public.libros set puntuacion=11`, `update public.libros set mes_lectura=1`,
-        `update public.libros set portada_url='https://tracker.test/pixel'`,
         `update public.metas_lectura set meta_libros=0`,
         `insert into public.libros(user_id,google_books_id,titulo,estado) values ('${A}','google-1','duplicate','Leído')`,
       ]) await assert.rejects(db.exec(sql))
@@ -74,6 +75,14 @@ test('PostgreSQL enforces ownership, constraints and shared search quotas', asyn
       await asUser(db, 'authenticated', A)
       assert.equal((await db.query<{ allowed: boolean }>('select public.consume_book_search() as allowed')).rows[0].allowed, true)
     })
+    await t.test('cover quota is separate from search and enforces account limits', async () => {
+      await asUser(db, 'authenticated', A)
+      for (let i = 0; i < 120; i++) assert.equal((await db.query<{ allowed: boolean }>('select public.consume_cover_request() as allowed')).rows[0].allowed, true)
+      assert.equal((await db.query<{ allowed: boolean }>('select public.consume_cover_request() as allowed')).rows[0].allowed, false)
+      await assert.rejects(db.exec('select * from private.cover_request_limits'), /permission denied/)
+      await asUser(db, 'authenticated', B)
+      assert.equal((await db.query<{ allowed: boolean }>('select public.consume_cover_request() as allowed')).rows[0].allowed, true)
+    })
     await t.test('anonymous role has no access or quota RPC permission', async () => {
       await asUser(db, 'anon', '')
       for (const table of ['libros', 'metas_lectura']) {
@@ -82,6 +91,7 @@ test('PostgreSQL enforces ownership, constraints and shared search quotas', asyn
           table === 'libros' ? `update public.libros set titulo='anonymous'` : 'update public.metas_lectura set meta_libros=1']) await assert.rejects(db.exec(sql), /permission denied/)
       }
       await assert.rejects(db.exec('select public.consume_book_search()'), /permission denied/)
+      await assert.rejects(db.exec('select public.consume_cover_request()'), /permission denied/)
     })
     await t.test('owners can delete without affecting other accounts', async () => {
       await asUser(db, 'authenticated', A)
@@ -103,12 +113,14 @@ test('migration removes existing permissive policies and preserves legacy rows',
     await db.exec(`alter table public.libros alter column puntuacion type numeric(2,1);
       alter table public.libros enable row level security;
       create policy legacy_allow_all on public.libros for all to public using(true) with check(true);
-      insert into public.libros(user_id,titulo,estado,puntuacion) values ('${A}','Keep me','Leído',9.5);`)
+      insert into public.libros(user_id,titulo,estado,puntuacion,portada_url) values ('${A}','Keep me','Leído',9.5,'https://encrypted-tbn0.gstatic.com/images?q=tbn:original&s=10');`)
     await db.exec(migration)
     await asUser(db, 'authenticated', B)
     assert.equal((await db.query('select * from public.libros')).rows.length, 0)
     await asUser(db, 'authenticated', A)
     assert.equal((await db.query('select * from public.libros')).rows.length, 1)
+    assert.equal((await db.query<{ portada_url: string }>('select portada_url from public.libros')).rows[0].portada_url,
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:original&s=10')
     await db.exec('update public.libros set puntuacion=10')
   } finally { await db.close() }
 })

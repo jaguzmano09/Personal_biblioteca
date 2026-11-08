@@ -3,8 +3,8 @@
 ## Database and application rollout
 
 - Take a recoverable backup; apply the migration to staging first.
-- Resolve incompatible legacy rows without silently deleting user content. Common failures: duplicate book IDs for one owner, owners missing from `auth.users`, month without year, out-of-range values and custom cover hosts.
-- Apply `supabase/migrations/202611080001_public_launch.sql` once as the database owner. It deliberately replaces all policies on `libros` and `metas_lectura`; review any custom policy requirements beforehand.
+- Resolve incompatible legacy rows without silently deleting user content. Common failures: duplicate book IDs for one owner, owners missing from `auth.users`, month without year, out-of-range values and oversized text.
+- Apply `supabase/migrations/202611080001_public_launch.sql` once as the database owner, then `202611080002_manual_covers.sql`. If the old 001 failed on custom covers, issue `ROLLBACK` and retry the corrected 001 before applying 002. If 001 already succeeded, apply only 002. Neither migration rewrites cover URLs. It deliberately replaces all policies on `libros` and `metas_lectura`; review any custom policy requirements beforehand.
 - Verify RLS, grants, ownership constraints and the rate-limit RPC. Application table owners/administrators and service-role credentials remain privileged: never distribute their credentials or use them in the web app.
 - Deploy this branch's application after the migration. The search endpoint returns 503 rather than bypassing an unavailable limiter.
 - For rollback, prefer rolling back the app while keeping owner-only database policies. Do not disable RLS to fix an application issue. Use the backup and a reviewed follow-up migration for schema recovery.
@@ -31,7 +31,8 @@ Use distinct accounts A and B with independent browser sessions, plus a signed-o
 6. Search without authentication must return 401. Search 21 times within one minute as A: the quota must reject excess calls with 429 and `Retry-After`. B must have an independent quota. A may search again after the window expires.
 7. Changing dashboard years rapidly must keep the final selected year's goal. Pending/abandoned books must never advance completed-reading goals.
 8. Verify error messages on failed saves/deletes, missing IDs, mobile layout, labels and keyboard-only search selection.
-9. Check headers and browser network requests: no arbitrary cover/tracking hosts, no private pages cached by the hosting CDN, no service key in client bundles.
+9. Add a manual direct-image URL from an unrelated public provider (including `encrypted-tbn0.gstatic.com`), save it, reload and edit other reading fields. Confirm the stored source URL is unchanged. Private-address, HTML and SVG URLs must not be served by the image endpoint. Anonymous image requests must return 401.
+10. Check headers and browser network requests: the browser loads covers only through `/api/covers`, with no direct third-party image requests, no private pages cached by the hosting CDN, no service key in client bundles.
 
 ## Public-user operations
 

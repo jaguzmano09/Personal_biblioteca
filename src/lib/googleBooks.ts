@@ -18,7 +18,7 @@ interface GoogleVolumeItem {
 
 function normalizarVolumen(item: GoogleVolumeItem): GoogleBookResult {
   let portada: string | null = null
-  try { portada = coverUrl(item.volumeInfo.imageLinks?.thumbnail?.replace('http://', 'https://')) } catch { /* Unsupported hosts are not rendered. */ }
+  try { portada = coverUrl(item.volumeInfo.imageLinks?.thumbnail?.replace('http://', 'https://')) } catch { /* Invalid URL syntax is not rendered. */ }
   const info = item.volumeInfo
   const isbn13 = info.industryIdentifiers?.find(i => i.type === 'ISBN_13')?.identifier
   const isbn10 = info.industryIdentifiers?.find(i => i.type === 'ISBN_10')?.identifier
