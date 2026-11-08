@@ -1,5 +1,6 @@
 'use client'
 
+import { safeCover } from '@/lib/covers'
 import { useEffect, useState } from 'react'
 import { Search, Loader2 } from 'lucide-react'
 import { useDebounce } from '@/hooks/useDebounce'
@@ -18,26 +19,30 @@ export default function BuscadorGoogleBooks({ onSeleccionar }: Props) {
   const debouncedQuery = useDebounce(query, 400)
 
   useEffect(() => {
-    if (!debouncedQuery.trim()) {
+    if (debouncedQuery.trim().length < 2) {
       setResultados([])
+      setCargando(false)
+      setError(null)
       return
     }
 
     let cancelado = false
+    const controller = new AbortController()
     setCargando(true)
     setError(null)
 
-    fetch(`/api/google-books?q=${encodeURIComponent(debouncedQuery)}&maxResults=10`)
+    fetch(`/api/google-books?q=${encodeURIComponent(debouncedQuery)}&maxResults=10`, { signal: controller.signal })
       .then(async res => {
         if (!res.ok) {
-          throw new Error('Error al consultar Google Books')
+          const body = await res.json()
+          throw new Error(body.error || 'No se pudo consultar Google Books.')
         }
 
         const libros = await res.json() as GoogleBookResult[]
         if (!cancelado) setResultados(libros)
       })
-      .catch(() => {
-        if (!cancelado) setError('No se pudo conectar con Google Books.')
+      .catch(error => {
+        if (!cancelado) { setResultados([]); setError(error instanceof Error ? error.message : 'No se pudo conectar con Google Books.') }
       })
       .finally(() => {
         if (!cancelado) setCargando(false)
@@ -45,6 +50,7 @@ export default function BuscadorGoogleBooks({ onSeleccionar }: Props) {
 
     return () => {
       cancelado = true
+      controller.abort()
     }
   }, [debouncedQuery])
 
@@ -53,6 +59,8 @@ export default function BuscadorGoogleBooks({ onSeleccionar }: Props) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <input
+          aria-label="Buscar libros por título, autor o ISBN"
+          maxLength={200}
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
@@ -64,18 +72,19 @@ export default function BuscadorGoogleBooks({ onSeleccionar }: Props) {
         )}
       </div>
 
-      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-sm text-red-500">{error}</p>}
 
       {resultados.length > 0 && (
         <ul className="mt-2 border border-gray-200 rounded-lg divide-y max-h-80 overflow-y-auto">
           {resultados.map(libro => (
             <li
               key={libro.google_books_id}
-              onClick={() => onSeleccionar(libro)}
-              className="flex gap-3 p-3 hover:bg-gray-50 cursor-pointer"
+
+              className="hover:bg-gray-50"
             >
-              {libro.portada_url ? (
-                <img src={libro.portada_url} alt={libro.titulo} className="w-10 h-14 object-cover rounded" />
+              <button type="button" onClick={() => onSeleccionar(libro)} className="flex gap-3 p-3 w-full text-left">
+              {safeCover(libro.portada_url) ? (
+                <img src={safeCover(libro.portada_url)!} referrerPolicy="no-referrer" loading="lazy" alt={libro.titulo} className="w-10 h-14 object-cover rounded" />
               ) : (
                 <div className="w-10 h-14 bg-gray-200 rounded" />
               )}
@@ -88,6 +97,7 @@ export default function BuscadorGoogleBooks({ onSeleccionar }: Props) {
                   <p className="text-xs text-gray-400">{libro.fecha_publicacion}</p>
                 )}
               </div>
+              </button>
             </li>
           ))}
         </ul>

@@ -30,7 +30,7 @@ export default function FiltrosOrdenamiento({
 }: Props) {
   return (
     <div className="flex flex-wrap gap-3 items-center mb-6">
-      <input
+      <input aria-label="Buscar en tu biblioteca"
         type="text"
         placeholder="Buscar en tu biblioteca..."
         value={busqueda}
@@ -38,7 +38,7 @@ export default function FiltrosOrdenamiento({
         className="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-3 py-2 text-sm"
       />
 
-      <select
+      <select aria-label="Estado de lectura"
         value={estadoFiltro}
         onChange={e => onEstadoChange(e.target.value as EstadoLectura | 'Todos')}
         className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
@@ -46,7 +46,7 @@ export default function FiltrosOrdenamiento({
         {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
       </select>
 
-      <select
+      <select aria-label="Año de lectura"
         value={anioFiltro}
         onChange={e => onAnioChange(e.target.value)}
         className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
@@ -55,7 +55,7 @@ export default function FiltrosOrdenamiento({
         {aniosDisponibles.map(a => <option key={a} value={a}>{a}</option>)}
       </select>
 
-      <select
+      <select aria-label="Procedencia"
         value={procedenciaFiltro}
         onChange={e => onProcedenciaChange(e.target.value as ProcedenciaLibro | 'Todos')}
         className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
@@ -63,7 +63,7 @@ export default function FiltrosOrdenamiento({
         {PROCEDENCIAS.map(p => <option key={p} value={p}>{p}</option>)}
       </select>
 
-      <select
+      <select aria-label="Orden del catálogo"
         value={orden}
         onChange={e => onOrdenChange(e.target.value as Ordenamiento)}
         className="border border-gray-300 rounded-lg px-3 py-2 text-sm"

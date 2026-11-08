@@ -1,5 +1,6 @@
 'use client'
 
+import { safeCover } from '@/lib/covers'
 import { useState } from 'react'
 import { guardarLibro } from '@/lib/libros'
 import { useRouter } from 'next/navigation'
@@ -64,9 +65,9 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Vista previa del libro elegido */}
       <div className="flex gap-4 p-4 bg-gray-50 rounded-lg">
-        {libroSeleccionado.portada_url ? (
+        {safeCover(libroSeleccionado.portada_url) ? (
           <img
-            src={libroSeleccionado.portada_url}
+            src={safeCover(libroSeleccionado.portada_url)!} referrerPolicy="no-referrer" loading="lazy"
             alt={libroSeleccionado.titulo}
             className="w-16 h-24 object-cover rounded"
           />
@@ -87,10 +88,10 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">
-          URL de portada <span className="text-gray-400 font-normal">(opcional, sobreescribe la de Google Books)</span>
+        <label htmlFor="libroformpersonal-1" className="block text-sm font-medium mb-1">
+          URL de portada (Google Books u Open Library, HTTPS) <span className="text-gray-400 font-normal">(opcional)</span>
         </label>
-        <input
+        <input id="libroformpersonal-1"
           type="url"
           placeholder="https://..."
           value={portadaUrl}
@@ -101,8 +102,8 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Estado</label>
-          <select
+          <label htmlFor="libroformpersonal-2" className="block text-sm font-medium mb-1">Estado</label>
+          <select id="libroformpersonal-2"
             value={estado}
             onChange={e => setEstado(e.target.value as EstadoLectura)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
@@ -114,8 +115,8 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Puntuación (0-10)</label>
-          <input
+          <label htmlFor="libroformpersonal-3" className="block text-sm font-medium mb-1">Puntuación (0-10)</label>
+          <input id="libroformpersonal-3"
             type="number"
             min="0"
             max="10"
@@ -127,8 +128,8 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Formato</label>
-          <select
+          <label htmlFor="libroformpersonal-4" className="block text-sm font-medium mb-1">Formato</label>
+          <select id="libroformpersonal-4"
             value={formato}
             onChange={e => setFormato(e.target.value as FormatoLectura)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
@@ -139,8 +140,8 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Procedencia</label>
-          <select
+          <label htmlFor="libroformpersonal-5" className="block text-sm font-medium mb-1">Procedencia</label>
+          <select id="libroformpersonal-5"
             value={procedencia}
             onChange={e => setProcedencia(e.target.value as ProcedenciaLibro)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
@@ -151,8 +152,8 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Año de lectura</label>
-          <input
+          <label htmlFor="libroformpersonal-6" className="block text-sm font-medium mb-1">Año de lectura</label>
+          <input id="libroformpersonal-6"
             type="number"
             placeholder="Ej: 2024"
             min="1000"
@@ -164,10 +165,10 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label htmlFor="libroformpersonal-7" className="block text-sm font-medium mb-1">
             Mes <span className="text-gray-400 font-normal">(opcional)</span>
           </label>
-          <select
+          <select id="libroformpersonal-7"
             value={mesLectura}
             onChange={e => setMesLectura(e.target.value)}
             disabled={!anioLectura}
@@ -191,8 +192,8 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Personaje favorito</label>
-        <input
+        <label htmlFor="libroformpersonal-8" className="block text-sm font-medium mb-1">Personaje favorito</label>
+        <input id="libroformpersonal-8"
           type="text"
           value={personajeFavorito}
           onChange={e => setPersonajeFavorito(e.target.value)}
@@ -201,8 +202,8 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Resumen / Análisis personal</label>
-        <textarea
+        <label htmlFor="libroformpersonal-9" className="block text-sm font-medium mb-1">Resumen / Análisis personal</label>
+        <textarea id="libroformpersonal-9"
           value={resumenAnalisis}
           onChange={e => setResumenAnalisis(e.target.value)}
           rows={5}
@@ -211,8 +212,8 @@ export default function LibroFormPersonal({ libroSeleccionado, onCancelar }: Pro
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Citas destacadas</label>
-        <textarea
+        <label htmlFor="libroformpersonal-10" className="block text-sm font-medium mb-1">Citas destacadas</label>
+        <textarea id="libroformpersonal-10"
           value={citasDestacadas}
           onChange={e => setCitasDestacadas(e.target.value)}
           rows={3}

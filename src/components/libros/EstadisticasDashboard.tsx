@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { Pencil, Check } from 'lucide-react'
 import { guardarMeta, obtenerMeta } from '@/lib/metas'
+import { readingStatistics } from '@/lib/statistics'
 import type { Libro } from '@/lib/types'
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 export default function EstadisticasDashboard({ libros, metaInicial, anioActual }: Props) {
   const [anioSeleccionado, setAnioSeleccionado] = useState(anioActual)
   const [meta, setMeta] = useState(metaInicial)
+  const [error, setError] = useState<string | null>(null)
   const [cargandoMeta, setCargandoMeta] = useState(false)
 
   const [editandoMeta, setEditandoMeta] = useState(false)
@@ -27,59 +29,34 @@ export default function EstadisticasDashboard({ libros, metaInicial, anioActual 
     return Array.from(anios).sort((a, b) => b - a)
   }, [libros, anioActual])
 
-  // Cada vez que cambia el año seleccionado (y no es el año inicial), busca su meta
   useEffect(() => {
-    if (anioSeleccionado === anioActual) {
-      setMeta(metaInicial)
-      setMetaInput(metaInicial?.toString() ?? '')
-      return
-    }
-
+    let active = true
+    setError(null)
+    setMeta(null)
     setCargandoMeta(true)
+    setEditandoMeta(false)
     obtenerMeta(anioSeleccionado)
-      .then(valor => {
-        setMeta(valor)
-        setMetaInput(valor?.toString() ?? '')
-      })
-      .finally(() => setCargandoMeta(false))
-  }, [anioSeleccionado, anioActual, metaInicial])
+      .then(value => { if (active) { setMeta(value); setMetaInput(value?.toString() ?? '') } })
+      .catch(() => { if (active) setError('No se pudo cargar la meta. Vuelve a seleccionar el año.') })
+      .finally(() => { if (active) setCargandoMeta(false) })
+    return () => { active = false }
+  }, [anioSeleccionado, metaInicial])
 
-  const stats = useMemo(() => {
-    const librosDelAnio = libros.filter(l => l.anio_lectura === anioSeleccionado)
-
-    const conPuntuacion = librosDelAnio.filter(l => l.puntuacion != null)
-    const promedioPuntuacion = conPuntuacion.length
-      ? conPuntuacion.reduce((sum, l) => sum + (l.puntuacion ?? 0), 0) / conPuntuacion.length
-      : null
-
-    const conteoAutores = new Map<string, number>()
-    librosDelAnio.forEach(l => {
-      l.autores?.forEach(a => conteoAutores.set(a, (conteoAutores.get(a) ?? 0) + 1))
-    })
-    let autorTop: string | null = null
-    let maxConteo = 1
-    conteoAutores.forEach((count, autor) => {
-      if (count > maxConteo) {
-        maxConteo = count
-        autorTop = autor
-      }
-    })
-
-    const totalPaginas = librosDelAnio
-      .filter(l => l.estado === 'Leído')
-      .reduce((sum, l) => sum + (l.paginas ?? 0), 0)
-
-    return { total: librosDelAnio.length, promedioPuntuacion, autorTop, totalPaginas }
-  }, [libros, anioSeleccionado])
+  const stats = useMemo(() => readingStatistics(libros, anioSeleccionado), [libros, anioSeleccionado])
 
   function handleGuardarMeta() {
     const valor = Number(metaInput)
-    if (!valor || valor <= 0) return
+    if (!Number.isSafeInteger(valor) || valor <= 0 || valor > 100000) {
+      setError('La meta debe ser un entero entre 1 y 100000.'); return
+    }
+    setError(null)
 
     startTransition(async () => {
-      await guardarMeta(anioSeleccionado, valor)
-      setMeta(valor)
-      setEditandoMeta(false)
+      try {
+        await guardarMeta(anioSeleccionado, valor)
+        setMeta(valor)
+        setEditandoMeta(false)
+      } catch { setError('No se pudo guardar la meta. Inténtalo de nuevo.') }
     })
   }
 
@@ -90,6 +67,8 @@ export default function EstadisticasDashboard({ libros, metaInicial, anioActual 
       <div className="flex justify-between items-center px-4 pt-4">
         <p className="font-mono text-[10px] text-ink/50 uppercase tracking-wide">Estadísticas de</p>
         <select
+          aria-label="Año de estadísticas"
+          disabled={isPending}
           value={anioSeleccionado}
           onChange={e => setAnioSeleccionado(Number(e.target.value))}
           className="font-mono text-sm border border-rule px-2 py-1 bg-paper"
@@ -119,6 +98,7 @@ export default function EstadisticasDashboard({ libros, metaInicial, anioActual 
         </div>
       </div>
 
+      {error && <p role="alert" className="px-4 py-2 text-stamp">{error}</p>}
       <div className="p-4">
         <div className="flex justify-between items-center mb-2">
           <p className="font-mono text-[10px] text-ink/50 uppercase tracking-wide">
@@ -131,13 +111,16 @@ export default function EstadisticasDashboard({ libros, metaInicial, anioActual 
             <div className="flex items-center gap-1.5">
               <input
                 type="number"
+                aria-label="Número de libros de la meta"
+                max="100000"
+                step="1"
                 min="1"
                 autoFocus
                 value={metaInput}
                 onChange={e => setMetaInput(e.target.value)}
                 className="w-16 border border-rule px-1.5 py-0.5 text-xs font-mono"
               />
-              <button onClick={handleGuardarMeta} disabled={isPending} className="text-cloth-dark">
+              <button aria-label="Guardar meta" onClick={handleGuardarMeta} disabled={isPending} className="text-cloth-dark">
                 <Check className="w-3.5 h-3.5" />
               </button>
             </div>

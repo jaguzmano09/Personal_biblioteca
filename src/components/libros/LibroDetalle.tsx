@@ -1,5 +1,6 @@
 'use client'
 
+import { safeCover } from '@/lib/covers'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -11,8 +12,9 @@ const ESTADOS: EstadoLectura[] = ['Pendiente', 'Leyendo', 'Leído', 'Abandonado'
 const FORMATOS: FormatoLectura[] = ['Física', 'Digital']
 const PROCEDENCIAS: ProcedenciaLibro[] = ['Casa de mis papás', 'Regalado', 'Comprado']
 
-export default function LibroDetalleModal({ libro }: { libro: Libro }) {
+export default function LibroDetalle({ libro }: { libro: Libro }) {
   const router = useRouter()
+  const [error, setError] = useState<string | null>(null)
   const [editando, setEditando] = useState(false)
   const [guardando, setGuardando] = useState(false)
   const [eliminando, setEliminando] = useState(false)
@@ -29,6 +31,7 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
   const [portadaUrl, setPortadaUrl] = useState(libro.portada_url ?? '')
 
   async function handleGuardar() {
+    setError(null)
     setGuardando(true)
     try {
       await actualizarLibro(libro.id, {
@@ -45,6 +48,8 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
       })
       setEditando(false)
       router.refresh()
+    } catch {
+      setError('No se pudieron guardar los cambios. Revisa los campos e inténtalo de nuevo.')
     } finally {
       setGuardando(false)
     }
@@ -52,10 +57,13 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
 
   async function handleEliminar() {
     if (!confirm(`¿Eliminar "${libro.titulo}" de tu biblioteca?`)) return
+    setError(null)
     setEliminando(true)
     try {
       await eliminarLibro(libro.id)
       router.push('/biblioteca')
+    } catch {
+      setError('No se pudo eliminar el libro. Inténtalo de nuevo.')
     } finally {
       setEliminando(false)
     }
@@ -70,9 +78,9 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
         <ArrowLeft className="w-3.5 h-3.5" /> volver a la biblioteca
       </Link>
 
-      <div className="flex gap-6 pb-6 border-b border-rule">
-        {libro.portada_url ? (
-          <img src={libro.portada_url} alt={libro.titulo} className="w-40 border border-rule" />
+      <div className="flex flex-col sm:flex-row gap-6 pb-6 border-b border-rule">
+        {safeCover(libro.portada_url) ? (
+          <img src={safeCover(libro.portada_url)!} referrerPolicy="no-referrer" loading="lazy" alt={libro.titulo} className="w-40 border border-rule" />
         ) : (
           <div className="w-40 h-56 bg-rule/20 border border-rule" />
         )}
@@ -88,22 +96,32 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
           )}
 
           <div className="flex gap-2 mt-4 font-mono text-xs">
-            <button onClick={() => setEditando(!editando)} className="border border-ink px-3 py-1.5 hover:bg-ink hover:text-paper transition-colors">
+            <button disabled={guardando || eliminando} onClick={() => {
+              if (!editando) {
+                setEstado(libro.estado); setPuntuacion(libro.puntuacion?.toString() ?? '')
+                setResumenAnalisis(libro.resumen_analisis ?? ''); setPersonajeFavorito(libro.personaje_favorito ?? '')
+                setCitasDestacadas(libro.citas_destacadas ?? ''); setAnioLectura(libro.anio_lectura?.toString() ?? '')
+                setMesLectura(libro.mes_lectura?.toString() ?? ''); setFormato(libro.formato ?? '')
+                setProcedencia(libro.procedencia ?? ''); setPortadaUrl(libro.portada_url ?? '')
+              }
+              setError(null); setEditando(!editando)
+            }} className="border border-ink px-3 py-1.5 hover:bg-ink hover:text-paper transition-colors">
               {editando ? 'cancelar' : 'editar'}
             </button>
-            <button onClick={handleEliminar} disabled={eliminando} className="border border-stamp text-stamp px-3 py-1.5 hover:bg-stamp hover:text-paper transition-colors disabled:opacity-50">
+            <button onClick={handleEliminar} disabled={eliminando || guardando} className="border border-stamp text-stamp px-3 py-1.5 hover:bg-stamp hover:text-paper transition-colors disabled:opacity-50">
               {eliminando ? 'eliminando...' : 'eliminar'}
             </button>
           </div>
         </div>
       </div>
 
+      {error && <p role="alert" className="mt-4 text-stamp">{error}</p>}
       <div className="mt-8 space-y-4">
         {editando ? (
           <>
             <div>
-              <label className="block text-sm font-medium mb-1">URL de portada</label>
-              <input
+              <label htmlFor="librodetallemodal-1" className="block text-sm font-medium mb-1">URL de portada (Google Books u Open Library, HTTPS)</label>
+              <input id="librodetallemodal-1"
                 type="url"
                 value={portadaUrl}
                 onChange={e => setPortadaUrl(e.target.value)}
@@ -113,8 +131,8 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Estado</label>
-                <select
+                <label htmlFor="librodetallemodal-2" className="block text-sm font-medium mb-1">Estado</label>
+                <select id="librodetallemodal-2"
                   value={estado}
                   onChange={e => setEstado(e.target.value as EstadoLectura)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
@@ -123,8 +141,8 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Puntuación</label>
-                <input
+                <label htmlFor="librodetallemodal-3" className="block text-sm font-medium mb-1">Puntuación</label>
+                <input id="librodetallemodal-3"
                   type="number" min="0" max="10" step="0.5"
                   value={puntuacion}
                   onChange={e => setPuntuacion(e.target.value)}
@@ -132,8 +150,8 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Formato</label>
-                <select
+                <label htmlFor="librodetallemodal-4" className="block text-sm font-medium mb-1">Formato</label>
+                <select id="librodetallemodal-4"
                   value={formato}
                   onChange={e => setFormato(e.target.value as FormatoLectura)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
@@ -143,8 +161,8 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Procedencia</label>
-                <select
+                <label htmlFor="librodetallemodal-5" className="block text-sm font-medium mb-1">Procedencia</label>
+                <select id="librodetallemodal-5"
                   value={procedencia}
                   onChange={e => setProcedencia(e.target.value as ProcedenciaLibro)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
@@ -157,8 +175,8 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Año de lectura</label>
-                <input
+                <label htmlFor="librodetallemodal-6" className="block text-sm font-medium mb-1">Año de lectura</label>
+                <input id="librodetallemodal-6"
                   type="number"
                   value={anioLectura}
                   onChange={e => setAnioLectura(e.target.value)}
@@ -166,8 +184,8 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Mes de lectura</label>
-                <input
+                <label htmlFor="librodetallemodal-7" className="block text-sm font-medium mb-1">Mes de lectura</label>
+                <input id="librodetallemodal-7"
                   type="number"
                   min="1"
                   max="12"
@@ -179,8 +197,8 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Personaje favorito</label>
-              <input
+              <label htmlFor="librodetallemodal-8" className="block text-sm font-medium mb-1">Personaje favorito</label>
+              <input id="librodetallemodal-8"
                 type="text"
                 value={personajeFavorito}
                 onChange={e => setPersonajeFavorito(e.target.value)}
@@ -189,8 +207,8 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Resumen / Análisis</label>
-              <textarea
+              <label htmlFor="librodetallemodal-9" className="block text-sm font-medium mb-1">Resumen / Análisis</label>
+              <textarea id="librodetallemodal-9"
                 value={resumenAnalisis}
                 onChange={e => setResumenAnalisis(e.target.value)}
                 rows={6}
@@ -199,8 +217,8 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Citas destacadas</label>
-              <textarea
+              <label htmlFor="librodetallemodal-10" className="block text-sm font-medium mb-1">Citas destacadas</label>
+              <textarea id="librodetallemodal-10"
                 value={citasDestacadas}
                 onChange={e => setCitasDestacadas(e.target.value)}
                 rows={3}
@@ -210,7 +228,7 @@ export default function LibroDetalleModal({ libro }: { libro: Libro }) {
 
             <button
               onClick={handleGuardar}
-              disabled={guardando}
+              disabled={guardando || eliminando}
               className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
               <Save className="w-4 h-4" /> {guardando ? 'Guardando...' : 'Guardar cambios'}

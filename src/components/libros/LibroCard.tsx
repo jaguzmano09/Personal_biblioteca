@@ -1,3 +1,4 @@
+import { safeCover } from '@/lib/covers'
 import Link from 'next/link'
 import type { Libro } from '@/lib/types'
 
@@ -27,9 +28,9 @@ export default function LibroCard({ libro }: { libro: Libro }) {
       </div>
 
       <div className="aspect-[2/3] bg-rule/20 overflow-hidden">
-        {libro.portada_url ? (
+        {safeCover(libro.portada_url) ? (
           <img
-            src={libro.portada_url}
+            src={safeCover(libro.portada_url)!} referrerPolicy="no-referrer" loading="lazy"
             alt={libro.titulo}
             className="w-full h-full object-cover"
           />

@@ -1,484 +1,164 @@
 # Mi Biblioteca
 
-<div align="center">
+A private reading journal and personal book catalog built with Next.js, React and Supabase. The interface is in Spanish; this documentation is in English.
 
-![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)
-![Supabase](https://img.shields.io/badge/Supabase-Auth%20%2B%20DB-3ECF8E?style=for-the-badge&logo=supabase)
-![Tailwind](https://img.shields.io/badge/Tailwind-4-06B6D4?style=for-the-badge&logo=tailwindcss)
+Users can discover books through Google Books, maintain their own catalog, record reviews and reading dates, and track annual reading goals. Public registration does **not** make anyone's library public.
 
-<h3>📚 Biblioteca personal de lectura, privada, ordenada y analítica</h3>
+## Features
 
-</div>
+- Email/password registration, email confirmation and cookie-based sessions.
+- Private book creation, editing and deletion.
+- Google Books search by title, author or ISBN, with a server-side API key.
+- Reading states: pending, reading, completed and abandoned.
+- Scores from 0 to 10, personal analysis, favorite characters and quotations.
+- Reading year/month, physical/digital format and book provenance.
+- Catalog search, filters, sorting and incremental display of 50 books.
+- Annual goals and statistics based **only on completed books** in the selected year.
 
-> Una aplicación para llevar un registro inteligente de cada libro leído, leyendo o pendiente, con una experiencia minimalista y personal.
+## Stack and requirements
 
-Mi Biblioteca permite gestionar una biblioteca propia con autenticación segura, búsqueda automatizada desde Google Books y métricas para seguir el progreso lector a lo largo del tiempo.
-
----
-
-## ✨ Vista rápida
-
-- Registro e inicio de sesión con Supabase
-- Búsqueda de libros desde Google Books
-- Catálogo personal por usuario
-- Estado de lectura, reseñas y puntuaciones
-- Metas anuales de lectura
-- Dashboard con estadísticas de hábito lector
-- Diseño limpio y editorial, pensado para foco y lectura
-
----
-
-## 🧭 Índice
-
-- [Resumen general](#-resumen-general)
-- [Características principales](#-características-principales)
-- [Stack tecnológico](#-stack-tecnológico)
-- [Arquitectura del proyecto](#-arquitectura-del-proyecto)
-- [Flujos de la aplicación](#-flujos-de-la-aplicación)
-- [Requisitos previos](#-requisitos-previos)
-- [Configuración del entorno](#-configuración-del-entorno)
-- [Instalación](#-instalación)
-- [Ejecución local](#-ejecución-local)
-- [Base de datos y Supabase](#-base-de-datos-y-supabase)
-- [Cómo se usa la aplicación](#-cómo-se-usa-la-aplicación)
-- [Notas de seguridad](#-notas-de-seguridad)
-- [Despliegue](#-despliegue)
-- [Roadmap futuro](#-roadmap-futuro)
-
----
-
-## 🧠 Resumen general
-
-Mi Biblioteca es una plataforma de catálogo personal para lectores que quiere combinar dos cosas: orden y reflexión.
-
-No es solo guardar libros; también ayuda a recordar:
-
-- qué se leyó,
-- en qué estado quedó cada lectura,
-- cómo se sintió el usuario con cada libro,
-- cuántos libros se leen por año,
-- qué autores se repiten,
-- y qué tan lejos o cerca se está de la meta anual.
-
-La app está pensada para uso individual y privado, con rutas protegidas y acceso por sesión autenticada.
-
----
-
-## 🌟 Características principales
-
-### 1. 🔐 Autenticación de usuarios
-
-- Registro con email y contraseña
-- Inicio de sesión seguro
-- Cierre de sesión
-- Protección automática de rutas privadas
-- Redirección a `/biblioteca` cuando ya existe sesión
-
-### 2. 🔎 Búsqueda de libros con Google Books
-
-La app permite buscar por:
-
-- título
-- autor
-- ISBN
-
-Y obtiene información útil como:
-
-- autores
-- editorial
-- fecha de publicación
-- páginas
-- portada
-- ISBN
-
-### 3. 📖 Personalización del registro
-
-Cada libro puede registrarse con campos muy útiles para la bitácora personal:
-
-- estado: `Pendiente`, `Leyendo`, `Leído`, `Abandonado`
-- puntuación de 0 a 10
-- resumen o análisis personal
-- personaje favorito
-- citas destacadas
-- año y mes de lectura
-- formato: `Física` o `Digital`
-- procedencia: `Casa de mis papás`, `Regalado`, `Comprado`
-- portada personalizada opcional
-
-### 4. 📊 Dashboard de estadísticas
-
-La vista principal incluye métricas como:
-
-- libros del año seleccionado
-- puntuación promedio
-- autor más repetido
-- páginas leídas
-- progreso hacia la meta anual
-
-### 5. 🎯 Metas anuales de lectura
-
-El usuario puede:
-
-- definir una meta para cada año,
-- guardar esa meta por usuario,
-- comparar progreso real vs objetivo,
-- editarla directamente desde la interfaz.
-
-### 6. 🎨 Interfaz moderna y minimalista
-
-El proyecto sigue un estilo editorial y sobrio, con una sensación de lectura tranquila y una interfaz pensada para reducir ruido visual.
-
----
-
-## 🛠️ Stack tecnológico
-
-| Tecnología | Uso |
+| Technology | Purpose |
 | --- | --- |
-| Next.js 16 | Framework principal de la app |
-| React 19 | Interfaz de usuario |
-| TypeScript | Tipado seguro y mantenimiento |
-| Tailwind CSS | Estilos y diseño visual |
-| Supabase | Autenticación y persistencia de datos |
-| Google Books API | Búsqueda y metadatos del libro |
-| Lucide React | Iconografía |
+| Next.js 16 / React 19 | App Router, server rendering and UI |
+| TypeScript (strict mode) | Application types |
+| Tailwind CSS 4 / Lucide | Styling and icons |
+| Supabase Auth / PostgreSQL | Identity, persistence and row-level authorization |
+| Google Books API | Book discovery and metadata |
+| Node test runner / PGlite | Validation and PostgreSQL security regression tests |
 
-### Dependencias clave
+Use **Node.js 22.18+** (or a newer supported LTS) and npm. Node's built-in TypeScript stripping runs the tests. A Supabase project is required to run authenticated functionality. A Google Books API key is optional for development but recommended for a public deployment.
 
-- `next`: framework principal
-- `react` y `react-dom`: renderizado de interfaces
-- `@supabase/ssr`: integración con Supabase en servidor
-- `tailwindcss`: sistema de estilos
-- `lucide-react`: iconos visuales
-
----
-
-## 🏗️ Arquitectura del proyecto
-
-```text
-Personal_biblioteca/
-├── src/
-│   ├── app/
-│   │   ├── (auth)/
-│   │   │   ├── login/
-│   │   │   └── registro/
-│   │   ├── (protected)/
-│   │   │   ├── biblioteca/
-│   │   │   │   ├── [id]/
-│   │   │   │   └── agregar/
-│   │   │   └── layout.tsx
-│   │   ├── api/
-│   │   │   └── auth/
-│   │   │       └── callback/
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   ├── components/
-│   │   ├── auth/
-│   │   ├── libros/
-│   │   └── ui/
-│   ├── hooks/
-│   │   └── useDebounce.ts
-│   ├── lib/
-│   │   ├── auth.ts
-│   │   ├── googleBooks.ts
-│   │   ├── libros.ts
-│   │   ├── metas.ts
-│   │   ├── types.ts
-│   │   └── supabase/
-│   ├── proxy.ts
-│   └── ...
-├── next.config.js
-├── package.json
-├── tailwind.config.ts
-├── tsconfig.json
-├── postcss.config.mjs
-├── README.md
-├── .env.local
-└── .gitignore
-```
-
-### Capas principales
-
-#### `src/app/`
-Responsable de las rutas y páginas de la aplicación:
-
-- login y registro
-- biblioteca privada
-- detalle y alta de libros
-- callback de autenticación
-
-#### `src/components/`
-Componentes visuales reutilizables:
-
-- formularios de autenticación
-- buscador externo
-- tarjetas de libros
-- modal de detalle
-- dashboard
-- formulario personal del libro
-
-#### `src/lib/`
-Lógica del negocio y acceso a servicios:
-
-- `auth.ts`: inicio, registro y cierre de sesión
-- `libros.ts`: CRUD de libros
-- `metas.ts`: gestión de metas anuales
-- `googleBooks.ts`: consultas a la API
-- `types.ts`: tipos del dominio
-- `supabase/`: clientes del servidor y del navegador
-
-#### `src/proxy.ts`
-Se encarga de proteger rutas y redirigir usuarios no autenticados.
-
----
-
-## 🔄 Flujos de la aplicación
-
-### 1. Flujo de autenticación
-
-1. El usuario entra a `/login` o `/registro`.
-2. Registra o inicia sesión con Supabase Auth.
-3. La app redirige a `/biblioteca`.
-4. Si no hay sesión, se bloquea el acceso a rutas protegidas.
-
-### 2. Flujo principal de la biblioteca
-
-1. El usuario ve su catálogo.
-2. Busca libros en Google Books.
-3. Selecciona el título adecuado.
-4. Completa la información personal del libro.
-5. Guarda el registro bajo su perfil.
-
-### 3. Flujo de estadísticas
-
-1. La app obtiene la lista de libros del usuario.
-2. Agrupa datos por año.
-3. Calcula promedio, autor más repetido, páginas leídas y progreso.
-4. Muestra la meta anual con indicador visual.
-
----
-
-## ✅ Requisitos previos
-
-Necesitarás lo siguiente:
-
-- Node.js 18 o superior
-- npm, pnpm o yarn
-- una cuenta de Supabase
-- acceso a la Google Books API
-
----
-
-## ⚙️ Configuración del entorno
-
-Crea un archivo `.env.local` con el siguiente contenido:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_GOOGLE_BOOKS_API_KEY=tu_api_key_de_google_books
-```
-
-### Variables explicadas
-
-- `NEXT_PUBLIC_SUPABASE_URL`: URL del proyecto en Supabase
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: clave pública del proyecto
-- `NEXT_PUBLIC_SITE_URL`: dominio local o de producción para callbacks
-- `NEXT_PUBLIC_GOOGLE_BOOKS_API_KEY`: clave opcional para mayor estabilidad en la búsqueda
-
-> Si no agregas la clave de Google Books, la búsqueda puede seguir funcionando con menos disponibilidad o límites de cuota.
-
----
-
-## 📦 Instalación
-
-Desde la raíz del proyecto:
+## Quick start
 
 ```bash
-npm install
+git clone https://github.com/jaguzmano09/Personal_biblioteca.git
+cd Personal_biblioteca
+nvm use
+npm ci
+cp .env.example .env.local
 ```
 
-O usando otra herramienta:
-
-```bash
-pnpm install
-# o
-yarn install
-```
-
----
-
-## ▶️ Ejecución local
-
-Inicia la app:
+Fill in `.env.local`, apply the database migration described below, then start:
 
 ```bash
 npm run dev
 ```
 
-Luego abre:
+Open http://localhost:3000.
+
+### Environment variables
+
+All settings used by this application are **server-only**. Do not add `NEXT_PUBLIC_` variants.
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `SUPABASE_URL` | Yes | Supabase project URL |
+| `SUPABASE_ANON_KEY` | Yes | Supabase `anon` JWT or publishable key; RLS must be active |
+| `SITE_URL` | Yes | Exact application origin, e.g. `https://example.com`; no path/query |
+| `GOOGLE_BOOKS_API_KEY` | Recommended | Google Books API key used only by the server |
+
+Never use `service_role` or an `sb_secret_` key in this application. Privileged keys can bypass RLS. Configuration rejects known privileged key formats. HTTP is accepted for `SITE_URL` only on localhost/127.0.0.1.
+
+## Database setup and migration
+
+The schema and authorization rules are versioned in:
+
+[`supabase/migrations/202611080001_public_launch.sql`](supabase/migrations/202611080001_public_launch.sql)
+
+This migration supports a new project or the existing `libros`/`metas_lectura` schema documented by the original project. It is a **one-time migration**, not a script to repeatedly paste into production.
+
+1. Back up the existing database and test the migration on a staging copy.
+2. Inspect legacy rows for duplicate `(user_id, google_books_id)` pairs, orphaned owners, invalid scores/dates, unsupported cover URLs and oversized text. Resolve them deliberately before migrating. No records are automatically deleted or rewritten to pass validation.
+3. Run the SQL file in the Supabase SQL Editor as the database owner. Alternatively, apply it using your established Supabase CLI migration workflow. This repository does not contain a linked CLI project configuration.
+4. Confirm the transaction committed successfully and the new policies, constraints and `consume_book_search()` function exist.
+5. Deploy the matching application code **after** the migration.
+6. Test with two real accounts and an anonymous client as described in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+The migration is transactional: incompatible legacy data causes it to abort. If the SQL Editor leaves a failed transaction open, issue `ROLLBACK` before correcting data and retrying. Existing custom tables or additional exposed schemas require their own review.
+
+### What the migration enforces
+
+- RLS is enabled and forced on both application tables.
+- Anonymous clients have no table access.
+- Authenticated clients can select, insert, update and delete only their own rows.
+- Update policies check both the existing and resulting owner.
+- Legacy policies on these two tables are removed so old permissive policies cannot override isolation.
+- Ownership, creation timestamps and record identities cannot be reassigned through ordinary updates.
+- Owner foreign keys cascade on account deletion from Supabase Auth.
+- Scores use `numeric(3,1)`, including `10.0`; ranges and field lengths are constrained.
+- Google Books IDs are unique **per user**; annual goals are unique per user/year.
+- `updated_at` is maintained by database triggers.
+- A private table supports an atomic search quota shared across application instances.
+
+## Privacy and security model
+
+The application verifies the session for every data operation, applies an explicit owner filter, and validates incoming fields at runtime. PostgreSQL RLS remains the authoritative boundary for direct database API access. TypeScript types and protected pages alone are not authorization.
+
+Book updates accept only the personal reading fields and the cover URL. Submitted ownership, IDs, metadata and timestamps cannot overwrite protected fields. Errors shown to users do not include database/provider details. Session refresh cookies are retained on redirects, and session-dependent responses use `private, no-store`.
+
+Google Books search requires authentication. Each account can make **20 searches per minute**, with a maximum of 20 results and query length of 2–200 characters. The quota is stored in PostgreSQL, not process memory, and search fails closed if the limiter is unavailable. Upstream requests time out after eight seconds. This is an account-level control; configure edge-level abuse protection and Google quota limits before launch.
+
+Cover images are restricted to HTTPS on `books.google.com`, `books.googleusercontent.com` and `covers.openlibrary.org`. Existing unsupported URLs are not rendered; the migration requires correcting/removing them first. Image requests omit the referrer, but their providers still receive the visitor's IP. Google receives book-search queries from the server. Supabase and the hosting provider process authentication/application traffic. Personal reviews and quotations are not sent to Google Books.
+
+Security headers disable framing, MIME sniffing, camera/microphone/location permissions and referrer disclosure. The CSP currently restricts framing, objects, base URLs and form destinations; it is **not a complete nonce-based script CSP**.
+
+Do not log passwords, tokens, search queries or reading notes. Define your public privacy notice, retention/deletion process and support contact before accepting public users. Account deletion/export and password recovery do not yet have self-service screens; account administration currently happens through Supabase.
+
+## Architecture
 
 ```text
-http://localhost:3000
+src/
+  app/
+    (auth)/                    Login and registration pages
+    (protected)/biblioteca/    Catalog, add-book and detail pages
+    api/auth/callback/         Email confirmation callback
+    api/google-books/          Authenticated, rate-limited search
+  components/
+    auth/                      Authentication forms
+    libros/                    Catalog, dashboard and reading forms
+  hooks/useDebounce.ts
+  lib/
+    auth.ts                    Authentication server actions
+    session.ts                 Verified-user requirement
+    libros.ts                  Owner-scoped book operations
+    metas.ts                   Owner-scoped annual goals
+    validation.ts              Runtime input validation and field allowlists
+    statistics.ts              Completed-reading calculations
+    googleBooks.ts             Single external metadata integration
+    covers.ts                  Safe cover rendering
+    supabase/                  Server client and configuration
+  proxy.ts                     Session refresh and navigation protection
+supabase/migrations/           PostgreSQL schema, RLS, triggers and search quota
+tests/                         Validation and database isolation tests
 ```
 
-Para entorno de producción:
+## Verification
 
 ```bash
+npm test
 npm run build
-npm run start
+npm run typecheck
+npm run test:smoke
+npm start
 ```
 
----
+The tests run PostgreSQL through PGlite without production credentials. They emulate Supabase's roles and `auth.uid()` JWT subject while executing the actual migration and RLS rules. Coverage includes account isolation, anonymous denial, owner spoofing, immutable identities, constraints, duplicate prevention, search quotas, legacy-policy replacement, input allowlists and completed-reading metrics.
 
-## 🗄️ Base de datos y Supabase
+These checks do not replace staging tests against Supabase Auth, PostgREST and your real deployment. A production smoke test also verifies anonymous route/API denial, callback errors and security headers using local placeholder settings. CI runs tests, production build, type checking and smoke checks on pull requests and pushes to `main`.
 
-La app guarda la información central en Supabase, especialmente:
+## Deployment
 
-- usuarios autenticados
-- libros por usuario
-- metas anuales de lectura
+Use a Node-compatible Next.js host such as Vercel. Configure server environment variables, apply the migration, and configure Supabase Auth's Site URL and exact confirmation callback URL:
 
-### Tabla recomendada: `libros`
-
-```sql
-id uuid primary key default gen_random_uuid(),
-user_id uuid not null,
-google_books_id text,
-titulo text not null,
-autores text[],
-editorial text,
-fecha_publicacion text,
-paginas integer,
-portada_url text,
-isbn text,
-estado text not null check (estado in ('Leído','Leyendo','Pendiente','Abandonado')),
-puntuacion numeric(2,1),
-resumen_analisis text,
-personaje_favorito text,
-citas_destacadas text,
-anio_lectura integer,
-mes_lectura integer,
-formato text check (formato in ('Física','Digital')),
-procedencia text check (procedencia in ('Casa de mis papás','Regalado','Comprado')),
-created_at timestamptz default now(),
-updated_at timestamptz default now()
+```text
+https://your-domain.example/api/auth/callback
 ```
 
-### Tabla recomendada: `metas_lectura`
+Enable email confirmation, configure production SMTP and appropriate Auth rate limits/password requirements. See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for release checks and operational requirements. This repository does not automatically change your Supabase or hosting account settings.
 
-```sql
-user_id uuid not null,
-anio integer not null,
-meta_libros integer not null,
-created_at timestamptz default now(),
-updated_at timestamptz default now(),
-primary key (user_id, anio)
-```
+## Current boundaries
 
-### Recomendaciones
-
-- habilita Row Level Security (RLS)
-- limita cada usuario a sus propios registros
-- usa políticas tipo `user_id = auth.uid()`
-- configura `updated_at` con triggers si lo deseas
-
----
-
-## 📚 Cómo se usa la aplicación
-
-### Registro
-
-1. Ingresa a `/registro`
-2. Completa email y contraseña
-3. Crea la cuenta
-4. Inicia sesión y entra a la biblioteca
-
-### Inicio de sesión
-
-1. Accede a `/login`
-2. Escribe tu correo y contraseña
-3. Serás redirigido a `/biblioteca`
-
-### Agregar un libro
-
-1. Entra a la sección de biblioteca
-2. Haz clic en `+ Agregar libro`
-3. Busca por título, autor o ISBN
-4. Selecciona el resultado
-5. Completa datos personales del libro
-6. Guarda el registro
-
-### Metas anuales
-
-1. Elige el año desde el dashboard
-2. Define cuántos libros quieres leer
-3. Observa la barra de progreso y el total acumulado
-
----
-
-## 🔒 Notas de seguridad
-
-- La autenticación se maneja con Supabase Auth
-- Las rutas protegidas validan sesión del usuario
-- La lógica sensible se mantiene en server-side
-- Las claves de acceso deben quedar en variables de entorno
-- No subir secretos ni credenciales al repositorio
-
----
-
-## 🚀 Despliegue
-
-La aplicación puede desplegarse fácilmente en:
-
-- Vercel
-- Netlify
-- cualquier hosting compatible con Next.js
-
-### Recomendación práctica para Vercel
-
-1. conecta el repositorio
-2. agrega las variables de entorno
-3. define la URL real en `NEXT_PUBLIC_SITE_URL`
-4. habilita Supabase con la misma configuración
-5. despliega la app
-
----
-
-## 🧩 Roadmap futuro
-
-Este proyecto ya tiene una buena base para crecer con nuevas funciones:
-
-- edición avanzada de libros
-- filtros por estado, autor o año
-- ordenamiento por puntuación o fecha
-- exportación a CSV o JSON
-- wishlist de libros pendientes
-- recomendaciones por autor o género
-- panel con gráficos más completos
-- soporte para colecciones temáticas
-
----
-
-## 🏁 Conclusión
-
-Mi Biblioteca es más que una simple base de datos de libros: es una bitácora personal de lectura, pensada para acompañar cada libro con contexto, memoria y hábito.
-
-Combina la organización de una biblioteca con la reflexión de un diariode lectura, en una solución clara, privada y moderna.
-
----
-
-## 💡 Nota final
-
-Este proyecto está pensado para crecer, adaptarse y convertirse en una herramienta más robusta de lectura y seguimiento personal.
-
-Si quieres, en el siguiente paso puedo dejarte una versión aún más premium del README con:
-
-- badges más visuales,
-- portada estilo GitHub,
-- mockups o screenshots,
-- y una presentación final mucho más elegante para compartir en público.
-
+- Books are fetched in bounded batches to avoid Supabase's response cap; the full per-user catalog is still loaded for local filtering/statistics. Large catalogs will eventually require server-side pagination and aggregate queries.
+- No social/public-library sharing, recommendations or self-service account export/deletion.
+- Reading history records one reading year/month per book, not multiple rereads.
+- Application strings remain in Spanish.

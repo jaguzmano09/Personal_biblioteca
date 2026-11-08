@@ -1,109 +1,57 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import type { GoogleBookResult, Libro, EstadoLectura,FormatoLectura, ProcedenciaLibro } from '@/lib/types'
+import type { GoogleBookResult, Libro } from './types'
+import { bookChanges, googleBook, personalData, uuid } from './validation'
+import { requireUser } from './session'
 import { revalidatePath } from 'next/cache'
 
-interface DatosPersonales {
-  estado: EstadoLectura
-  puntuacion?: number | null
-  resumen_analisis?: string | null
-  personaje_favorito?: string | null
-  citas_destacadas?: string | null
-  anio_lectura?: number | null
-  mes_lectura?: number | null
-  formato?: FormatoLectura | null
-  procedencia?: ProcedenciaLibro | null
-}
-
-export async function guardarLibro(
-  libroGoogle: GoogleBookResult,
-  datosPersonales: DatosPersonales
-) {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('No autenticado')
-
-  const { data, error } = await supabase
-    .from('libros')
-    .insert({
-      user_id: user.id,
-      google_books_id: libroGoogle.google_books_id,
-      titulo: libroGoogle.titulo,
-      autores: libroGoogle.autores,
-      editorial: libroGoogle.editorial,
-      fecha_publicacion: libroGoogle.fecha_publicacion,
-      paginas: libroGoogle.paginas,
-      portada_url: libroGoogle.portada_url,
-      isbn: libroGoogle.isbn,
-      ...datosPersonales,
-    })
-    .select()
-    .single()
-
-  if (error) {
-    if (error.code === '23505') {
-      throw new Error('Ya tienes este libro registrado en tu biblioteca.')
-    }
-    throw new Error(error.message)
-  }
-
+export async function guardarLibro(libroGoogle: GoogleBookResult, datosPersonales: unknown) {
+  const { supabase, user } = await requireUser()
+  const payload = { ...googleBook(libroGoogle), ...personalData(datosPersonales), user_id: user.id }
+  const { data, error } = await supabase.from('libros').insert(payload).select().single()
+  if (error) throw new Error(error.code === '23505'
+    ? 'Ya tienes este libro registrado en tu biblioteca.' : 'No se pudo guardar el libro.')
   revalidatePath('/biblioteca')
   return data as Libro
 }
 
-export async function actualizarLibro(id: string, cambios: Partial<Libro>) {
-  const supabase = await createClient()
-
-  const { data, error } = await supabase
-    .from('libros')
-    .update(cambios)
-    .eq('id', id)
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message)
-
+export async function actualizarLibro(id: string, cambios: unknown) {
+  const { supabase, user } = await requireUser()
+  const { data, error } = await supabase.from('libros').update(bookChanges(cambios))
+    .eq('id', uuid(id)).eq('user_id', user.id).select().single()
+  if (error) throw new Error('No se pudo actualizar el libro.')
   revalidatePath('/biblioteca')
   revalidatePath(`/biblioteca/${id}`)
   return data as Libro
 }
 
 export async function eliminarLibro(id: string) {
-  const supabase = await createClient()
-
-  const { error } = await supabase
-    .from('libros')
-    .delete()
-    .eq('id', id)
-
-  if (error) throw new Error(error.message)
-
+  const { supabase, user } = await requireUser()
+  const { data, error } = await supabase.from('libros').delete()
+    .eq('id', uuid(id)).eq('user_id', user.id).select('id').maybeSingle()
+  if (error || !data) throw new Error('No se pudo eliminar el libro.')
   revalidatePath('/biblioteca')
 }
 
 export async function obtenerLibros() {
-  const supabase = await createClient()
-
-  const { data, error } = await supabase
-    .from('libros')
-    .select('*')
-    .order('updated_at', { ascending: false })
-
-  if (error) throw new Error(error.message)
-  return data as Libro[]
+  const { supabase, user } = await requireUser()
+  // Supabase caps responses. Read bounded batches so the dashboard never silently omits books.
+  const libros: Libro[] = []
+  const batch = 500
+  for (let offset = 0; ; offset += batch) {
+    const { data, error } = await supabase.from('libros').select('*').eq('user_id', user.id)
+      .order('updated_at', { ascending: false }).order('id').range(offset, offset + batch - 1)
+    if (error) throw new Error('No se pudo cargar la biblioteca.')
+    libros.push(...data as Libro[])
+    if (data.length < batch) return libros
+  }
 }
 
 export async function obtenerLibroPorId(id: string) {
-  const supabase = await createClient()
-
-  const { data, error } = await supabase
-    .from('libros')
-    .select('*')
-    .eq('id', id)
-    .single()
-
-  if (error) throw new Error(error.message)
-  return data as Libro
+  const { supabase, user } = await requireUser()
+  // Missing and inaccessible IDs deliberately have the same result.
+  const { data, error } = await supabase.from('libros').select('*')
+    .eq('id', uuid(id)).eq('user_id', user.id).maybeSingle()
+  if (error) throw new Error('No se pudo cargar el libro.')
+  return data as Libro | null
 }

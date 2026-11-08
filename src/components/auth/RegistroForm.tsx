@@ -16,14 +16,12 @@ export default function RegistroForm() {
     setCargando(true)
     setError(null)
 
-    const resultado = await registrarUsuario(email, password)
-
-    if (resultado?.error) {
-      setError(resultado.error)
-    } else {
-      setExito(true)
-    }
-    setCargando(false)
+    try {
+      const resultado = await registrarUsuario(email, password)
+      if (resultado?.error) setError(resultado.error)
+      else setExito(true)
+    } catch { setError('No se pudo completar el registro. Inténtalo de nuevo.') }
+    finally { setCargando(false) }
   }
 
   if (exito) {
@@ -31,7 +29,7 @@ export default function RegistroForm() {
       <div className="max-w-sm mx-auto mt-16 px-4 text-center">
         <h1 className="text-2xl font-bold mb-4">¡Revisa tu correo!</h1>
         <p className="text-gray-600">
-          Te enviamos un enlace de confirmación a <strong>{email}</strong>. Confírmalo para poder iniciar sesión.
+          Si el registro es válido, recibirás un enlace de confirmación en <strong>{email}</strong>. Confírmalo para poder iniciar sesión.
         </p>
       </div>
     )
@@ -43,9 +41,11 @@ export default function RegistroForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Email</label>
-          <input
+          <label htmlFor="registroform-1" className="block text-sm font-medium mb-1">Email</label>
+          <input id="registroform-1"
             type="email"
+              autoComplete="email"
+              maxLength={254}
             required
             value={email}
             onChange={e => setEmail(e.target.value)}
@@ -54,18 +54,20 @@ export default function RegistroForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Contraseña</label>
-          <input
+          <label htmlFor="registroform-2" className="block text-sm font-medium mb-1">Contraseña</label>
+          <input id="registroform-2"
             type="password"
+              autoComplete="new-password"
             required
-            minLength={6}
+            minLength={12}
+            maxLength={128}
             value={password}
             onChange={e => setPassword(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
           />
         </div>
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
 
         <button
           type="submit"
