@@ -11,7 +11,7 @@ const request = () => new Request('https://hook.example', { method: 'POST', body
 
 test('confirmation links use trusted origins and preserve verification hash/type', () => {
   const [message] = buildMessages(payload, config)
-  const link = new URL(message.textContent.split('Abre este enlace: ')[1].split('\n')[0])
+  const link = new URL(message.textContent.match(/https:\/\/[^\s]+/)![0])
   assert.equal(link.origin, config.supabaseUrl)
   assert.equal(link.searchParams.get('token'), 'hash')
   assert.equal(link.searchParams.get('type'), 'signup')
@@ -65,4 +65,22 @@ test('provider rejection and timeout fail without exposing secrets or recipients
     const output = await response.text() + logs.join('')
     for (const sensitive of ['reader@example.com', 'test-secret', '123456', 'private details']) assert.ok(!output.includes(sensitive))
   }
+})
+
+test('shared brand identity reaches every email and untrusted content stays escaped', async () => {
+  const { brand } = await import('../supabase/functions/_shared/brand.js')
+  for (const type of ['signup', 'invite', 'recovery', 'magiclink', 'email_change', 'reauthentication']) {
+    const [message] = buildMessages({ ...payload, email_data: { ...payload.email_data, email_action_type: type } }, config)
+    assert.equal(message.sender.name, brand.name)
+    assert.ok(message.htmlContent.includes(brand.colors.cloth))
+    assert.ok(message.htmlContent.includes('lang="es"'))
+    assert.ok(!message.htmlContent.includes('<script'))
+  }
+  const name = brand.name
+  try {
+    brand.name = '<script>alert(1)</script>'
+    const [message] = buildMessages(payload, config)
+    assert.ok(message.htmlContent.includes('&lt;script&gt;'))
+    assert.ok(!message.htmlContent.includes('<script>'))
+  } finally { brand.name = name }
 })

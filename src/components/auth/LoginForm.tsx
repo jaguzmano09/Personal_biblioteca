@@ -1,4 +1,5 @@
 'use client'
+import { brand } from '../../../supabase/functions/_shared/brand.js'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -23,16 +24,16 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(176,141,62,0.12),_transparent_38%),linear-gradient(135deg,#f2ecdd_0%,#efe7d7_100%)] flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md overflow-hidden rounded-[28px] border border-[#c9bfa0] bg-[#f9f5ee]/90 shadow-[0_24px_80px_rgba(43,42,36,0.12)] backdrop-blur-sm">
-        <div className="border-b border-[#c9bfa0] bg-[#2b2a24] px-6 py-5 text-center text-[#f2ecdd]">
-          <p className="text-[11px] uppercase tracking-[0.28em] text-[#d8c9a7]">Mi Biblioteca</p>
-          <h1 className="mt-2 font-display text-3xl text-[#f9f5ee]">Iniciar sesión</h1>
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_color-mix(in_srgb,var(--brand-gilt)_12%,transparent),_transparent_38%),linear-gradient(135deg,var(--brand-paper)_0%,var(--brand-paper-end)_100%)] flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md overflow-hidden rounded-[28px] border border-rule bg-surface/90 shadow-[0_24px_80px_color-mix(in_srgb,var(--brand-ink)_12%,transparent)] backdrop-blur-sm">
+        <div className="border-b border-rule bg-ink px-6 py-5 text-center text-paper">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-muted">{brand.name}</p>
+          <h1 className="mt-2 font-display text-3xl text-surface">Iniciar sesión</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5 p-6 sm:p-8">
           <div className="space-y-2">
-            <label htmlFor="loginform-1" className="block text-sm font-medium text-[#2b2a24]">Email</label>
+            <label htmlFor="loginform-1" className="block text-sm font-medium text-ink">Email</label>
             <input id="loginform-1"
               type="email"
               autoComplete="email"
@@ -41,12 +42,12 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="tu@email.com"
-              className="w-full rounded-xl border border-[#c9bfa0] bg-white/70 px-3.5 py-3 text-sm text-[#2b2a24] shadow-sm outline-none transition focus:border-[#3f5c4c] focus:ring-4 focus:ring-[#3f5c4c]/10"
+              className="w-full rounded-xl border border-rule bg-white/70 px-3.5 py-3 text-sm text-ink shadow-sm outline-none transition focus:border-cloth focus:ring-4 focus:ring-cloth/10"
             />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="loginform-2" className="block text-sm font-medium text-[#2b2a24]">Contraseña</label>
+            <label htmlFor="loginform-2" className="block text-sm font-medium text-ink">Contraseña</label>
             <input id="loginform-2"
               type="password"
               autoComplete="current-password"
@@ -54,12 +55,12 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-xl border border-[#c9bfa0] bg-white/70 px-3.5 py-3 text-sm text-[#2b2a24] shadow-sm outline-none transition focus:border-[#3f5c4c] focus:ring-4 focus:ring-[#3f5c4c]/10"
+              className="w-full rounded-xl border border-rule bg-white/70 px-3.5 py-3 text-sm text-ink shadow-sm outline-none transition focus:border-cloth focus:ring-4 focus:ring-cloth/10"
             />
           </div>
 
           {error && (
-            <div role="alert" className="rounded-xl border border-[#a63d33]/30 bg-[#a63d33]/8 px-3 py-2 text-sm text-[#7a2f2a]">
+            <div role="alert" className="rounded-xl border border-stamp/30 bg-stamp/8 px-3 py-2 text-sm text-stamp-dark">
               {error}
             </div>
           )}
@@ -67,15 +68,15 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
           <button
             type="submit"
             disabled={cargando}
-            className="w-full rounded-xl bg-[#3f5c4c] px-4 py-3 text-sm font-medium text-[#f9f5ee] shadow-lg shadow-[#3f5c4c]/20 transition hover:bg-[#2f4739] disabled:cursor-not-allowed disabled:opacity-70"
+            className="w-full rounded-xl bg-cloth px-4 py-3 text-sm font-medium text-surface shadow-lg shadow-cloth/20 transition hover:bg-cloth-dark disabled:cursor-not-allowed disabled:opacity-70"
           >
             {cargando ? 'Ingresando...' : 'Ingresar'}
           </button>
         </form>
 
-        <div className="border-t border-[#c9bfa0] bg-[#f5efe5] px-6 py-4 text-center text-sm text-[#2b2a24]">
+        <div className="border-t border-rule bg-footer px-6 py-4 text-center text-sm text-ink">
           ¿No tienes cuenta?{' '}
-          <Link href="/registro" className="font-medium text-[#3f5c4c] transition hover:text-[#2f4739] hover:underline">
+          <Link href="/registro" className="font-medium text-cloth transition hover:text-cloth-dark hover:underline">
             Regístrate
           </Link>
         </div>

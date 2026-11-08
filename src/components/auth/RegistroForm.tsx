@@ -28,7 +28,7 @@ export default function RegistroForm() {
     return (
       <div className="max-w-sm mx-auto mt-16 px-4 text-center">
         <h1 className="text-2xl font-bold mb-4">¡Revisa tu correo!</h1>
-        <p className="text-gray-600">
+        <p className="text-ink/80">
           Si el registro es válido, recibirás un enlace de confirmación en <strong>{email}</strong>. Confírmalo para poder iniciar sesión.
         </p>
       </div>
@@ -67,20 +67,20 @@ export default function RegistroForm() {
           />
         </div>
 
-        {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
+        {error && <p role="alert" className="text-sm text-stamp">{error}</p>}
 
         <button
           type="submit"
           disabled={cargando}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          className="w-full bg-cloth text-white py-2 rounded-lg hover:bg-cloth-dark disabled:opacity-50"
         >
           {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
         </button>
       </form>
 
-      <p className="text-center text-sm text-gray-500 mt-4">
+      <p className="text-center text-sm text-ink/70 mt-4">
         ¿Ya tienes cuenta?{' '}
-        <Link href="/login" className="text-blue-600 hover:underline">
+        <Link href="/login" className="text-cloth hover:underline">
           Inicia sesión
         </Link>
       </p>

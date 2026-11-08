@@ -1,3 +1,5 @@
+import { brand } from '../_shared/brand.js'
+import { renderAuthEmail } from './template.js'
 // Runtime-neutral implementation; index.js supplies signature verification and secrets.
 const subjects = {
   signup: 'Confirma tu cuenta en Personal Biblioteca',
@@ -7,8 +9,6 @@ const subjects = {
   email_change: 'Confirma tu cambio de correo',
   reauthentication: 'Confirma tu identidad en Personal Biblioteca',
 }
-const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (c) =>
-  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 const required = (value) => {
   if (typeof value !== 'string' || !value.trim()) throw new Error('Invalid payload')
   return value
@@ -34,23 +34,20 @@ export function buildMessages(payload, config) {
       ]
     : [{ to: user.email, hash: data.token_hash, token: data.token }]
   return recipients.map(({ to, hash, token }) => {
-    let textContent
-    let htmlContent
+    let rendered
     if (type === 'reauthentication') {
       const otp = required(token)
       if (!/^\d{6,10}$/.test(otp)) throw new Error('Invalid OTP')
-      textContent = `Tu código de confirmación es: ${otp}. Si no lo solicitaste, ignora este correo.`
-      htmlContent = `<p>Tu código de confirmación es: <strong>${escapeHtml(otp)}</strong>.</p><p>Si no lo solicitaste, ignora este correo.</p>`
+      rendered = renderAuthEmail(type, { otp })
     } else {
       const verifyUrl = new URL('/auth/v1/verify', origin)
       verifyUrl.searchParams.set('token', required(hash))
       verifyUrl.searchParams.set('type', type)
       verifyUrl.searchParams.set('redirect_to', callback.href)
-      textContent = `${subject}. Abre este enlace: ${verifyUrl.href}\nSi no lo solicitaste, ignora este correo.`
-      htmlContent = `<h1>Personal Biblioteca</h1><p>${escapeHtml(subject)}</p><p><a href="${escapeHtml(verifyUrl.href)}">Continuar</a></p><p>Si no lo solicitaste, ignora este correo.</p>`
+      rendered = renderAuthEmail(type, { url: verifyUrl.href })
     }
-    return { sender: { email: email(config.senderEmail), name: 'Personal Biblioteca' },
-      to: [{ email: email(to) }], subject, textContent, htmlContent }
+    return { sender: { email: email(config.senderEmail), name: brand.name },
+      to: [{ email: email(to) }], subject: subject.replaceAll('Personal Biblioteca', brand.name), ...rendered }
   })
 }
 

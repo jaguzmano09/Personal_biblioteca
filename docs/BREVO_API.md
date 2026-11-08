@@ -96,3 +96,17 @@ No desactives la confirmación de correo. Revoca la clave API de Brevo si abando
 
 - https://supabase.com/docs/guides/auth/auth-hooks/send-email-hook
 - https://developers.brevo.com/reference/send-transac-email
+
+## Identidad visual compartida
+
+`supabase/functions/_shared/brand.js` contiene el nombre, descripción, paleta y tipografías
+seguras para correos. La web importa esa configuración y la expone como variables CSS para
+Tailwind. Los correos la importan directamente y generan estilos inline, sin cargar imágenes,
+fuentes externas ni scripts. `send-auth-email/template.js` contiene los mensajes y el diseño.
+
+Después de modificar la identidad, publica ambos consumidores: despliegue de Vercel desde `main`
+y `supabase functions deploy send-auth-email --project-ref jhncyzebeqyepmlccvny --no-verify-jwt`.
+El commit por sí solo no actualiza una función editada manualmente en el panel. La función ahora
+requiere `index.js`, `handler.js`, `template.js` y `../_shared/brand.js`; despliega desde el repositorio
+con la CLI para incluir automáticamente las importaciones compartidas. Conserva los secretos y el hook.
+Las plantillas de Authentication → Email Templates no controlan estos mensajes del hook.

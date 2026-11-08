@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+import { brand } from '../../supabase/functions/_shared/brand.js'
 import type { Metadata } from 'next'
 import { Fraunces, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
@@ -15,14 +17,14 @@ const plexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Mi Biblioteca',
-  description: 'Catálogo personal de lectura',
+  title: brand.name,
+  description: brand.description,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${fraunces.variable} ${plexMono.variable}`} suppressHydrationWarning>
-      <body>{children}</body>
+      <body style={Object.fromEntries(Object.entries(brand.colors).map(([key, value]) => [`--brand-${key}`, value])) as CSSProperties}>{children}</body>
     </html>
   )
 }

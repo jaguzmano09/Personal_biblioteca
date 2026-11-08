@@ -1,3 +1,4 @@
+import { brand } from '../../../supabase/functions/_shared/brand.js'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { cerrarSesion } from '@/lib/auth'
@@ -11,7 +12,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   return (
     <div className="min-h-screen bg-paper">
       <header className="border-b-2 border-ink px-4 sm:px-6 py-4 flex justify-between items-baseline">
-        <span className="font-display text-xl">Mi Biblioteca</span>
+        <span className="font-display text-xl">{brand.name}</span>
         <div className="flex items-center gap-4 font-mono text-xs text-ink/70">
           <span>{user?.email}</span>
           <form action={cerrarSesion}>
