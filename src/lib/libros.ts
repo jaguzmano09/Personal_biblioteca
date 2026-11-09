@@ -25,6 +25,27 @@ export async function actualizarLibro(id: string, cambios: unknown) {
   return data as Libro
 }
 
+export async function guardarNotaLibro(id: string, nota: unknown, notaAnterior: string | null) {
+  const { supabase, user } = await requireUser()
+  const libroId = uuid(id)
+
+  if (typeof nota !== 'string' || nota.length > 20000 ||
+      (notaAnterior !== null && (typeof notaAnterior !== 'string' || notaAnterior.length > 20000))) {
+    throw new Error('Nota inválida.')
+  }
+
+  const update = supabase.from('libros').update({ resumen_analisis: nota.trim() || null })
+    .eq('id', libroId).eq('user_id', user.id)
+  const matchingNote = notaAnterior === null
+    ? update.is('resumen_analisis', null)
+    : update.eq('resumen_analisis', notaAnterior)
+  const { data, error } = await matchingNote.select('id').maybeSingle()
+
+  if (error || !data) throw new Error('No se pudo guardar la nota.')
+  revalidatePath('/biblioteca')
+  revalidatePath(`/biblioteca/${libroId}`)
+}
+
 export async function eliminarLibro(id: string) {
   const { supabase, user } = await requireUser()
   const { data, error } = await supabase.from('libros').delete()
