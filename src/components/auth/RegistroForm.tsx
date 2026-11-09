@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Wordmark from '@/components/ui/Wordmark'
 import { registrarUsuario } from '@/lib/auth'
 
 export default function RegistroForm() {
@@ -26,64 +27,71 @@ export default function RegistroForm() {
 
   if (exito) {
     return (
-      <div className="max-w-sm mx-auto mt-16 px-4 text-center">
-        <h1 className="text-2xl font-bold mb-4">¡Revisa tu correo!</h1>
-        <p className="text-ink/80">
-          Si el registro es válido, recibirás un enlace de confirmación en <strong>{email}</strong>. Confírmalo para poder iniciar sesión.
-        </p>
-      </div>
+      <main className="mx-auto my-12 max-w-md px-5">
+        <Wordmark href="/login" />
+        <section className="mt-6 rounded-2xl border border-rule bg-surface p-6 sm:p-8" aria-labelledby="confirmation-title">
+          <h1 id="confirmation-title" className="mb-4 font-display text-3xl">¡Revisa tu correo!</h1>
+          <p className="text-ink/80">
+            Si el registro es válido, recibirás un enlace de confirmación en <strong>{email}</strong>. Confírmalo para poder iniciar sesión.
+          </p>
+          <Link href="/login" className="editorial-link mt-5 inline-block text-sm">Volver al inicio de sesión</Link>
+        </section>
+      </main>
     )
   }
 
   return (
-    <div className="max-w-sm mx-auto mt-16 px-4">
-      <h1 className="text-2xl font-bold mb-6 text-center">Crear cuenta</h1>
+    <main className="mx-auto my-12 max-w-md px-5">
+      <Wordmark href="/login" />
+      <section className="mt-6 rounded-2xl border border-rule bg-surface p-6 sm:p-8" aria-labelledby="registration-title">
+        <h1 id="registration-title" className="mb-6 font-display text-3xl">Crear cuenta</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="registroform-1" className="block text-sm font-medium mb-1">Email</label>
-          <input id="registroform-1"
-            type="email"
-              autoComplete="email"
-              maxLength={254}
-            required
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-4" aria-busy={cargando}>
+          <div>
+            <label htmlFor="registroform-1" className="block text-sm font-medium mb-1">Correo electrónico</label>
+            <input id="registroform-1"
+              type="email"
+                autoComplete="email"
+                maxLength={254}
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="editorial-input"
+            />
+          </div>
 
-        <div>
-          <label htmlFor="registroform-2" className="block text-sm font-medium mb-1">Contraseña</label>
-          <input id="registroform-2"
-            type="password"
-              autoComplete="new-password"
-            required
-            minLength={12}
-            maxLength={128}
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
+          <div>
+            <label htmlFor="registroform-2" className="block text-sm font-medium mb-1">Contraseña</label>
+            <input id="registroform-2"
+              type="password"
+                autoComplete="new-password"
+              required
+              minLength={12}
+              maxLength={128}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="editorial-input"
+            />
+          </div>
 
-        {error && <p role="alert" className="text-sm text-stamp">{error}</p>}
+          {error && <p role="alert" className="editorial-alert">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={cargando}
-          className="w-full bg-cloth text-white py-2 rounded-lg hover:bg-cloth-dark disabled:opacity-50"
-        >
-          {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={cargando}
+            className="editorial-button w-full"
+          >
+            {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
+          </button>
+        </form>
 
-      <p className="text-center text-sm text-ink/70 mt-4">
-        ¿Ya tienes cuenta?{' '}
-        <Link href="/login" className="text-cloth hover:underline">
-          Inicia sesión
-        </Link>
-      </p>
-    </div>
+        <p className="text-center text-sm text-ink/70 mt-4">
+          ¿Ya tienes cuenta?{' '}
+          <Link href="/login" className="editorial-link">
+            Inicia sesión
+          </Link>
+        </p>
+      </section>
+    </main>
   )
 }

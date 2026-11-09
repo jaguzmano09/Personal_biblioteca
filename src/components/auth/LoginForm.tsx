@@ -1,5 +1,5 @@
 'use client'
-import { brand } from '../../../supabase/functions/_shared/brand.js'
+import Wordmark from '@/components/ui/Wordmark'
 
 import { BookOpen, Bookmark, Quote, Eye, EyeOff, ArrowRight, LockKeyhole } from 'lucide-react'
 import { useState } from 'react'
@@ -29,11 +29,8 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
   return (
     <main className="min-h-svh bg-paper text-ink">
       <header className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-6 sm:px-10">
-        <Link href="/login" aria-label={`${brand.name}, inicio`} className="flex items-center gap-3 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cloth">
-          <BookOpen className="size-7 text-cloth" aria-hidden="true" />
-          <span className="font-display text-lg sm:text-xl">{brand.name}</span>
-        </Link>
-        <Link href="/registro" className="rounded-sm text-sm font-medium text-cloth underline decoration-rule underline-offset-4 hover:decoration-cloth focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cloth">Crear cuenta</Link>
+        <Wordmark href="/login" />
+        <Link href="/registro" className="editorial-link text-sm">Crear cuenta</Link>
       </header>
 
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 pb-12 pt-5 sm:px-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:pb-16 lg:pt-10">
@@ -42,7 +39,7 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
           <p className="mt-6 max-w-lg text-base leading-relaxed text-ink/75 sm:text-lg">Organiza lo que lees, guarda las frases que te acompañan y descubre cómo crece tu historia como lector.</p>
 
           <div className="login-bookshelf relative mt-9 hidden overflow-hidden rounded-t-[48%_12%] bg-cloth px-8 pb-0 pt-10 text-paper sm:block" aria-hidden="true">
-            <p className="mb-7 font-display text-xl text-paper/90">Cada lectura deja algo.</p>
+            <p className="mb-7 font-display text-xl text-paper/90">Cada lectura deja algo. <span className="ml-2 text-gilt">✦</span></p>
             <div className="flex h-44 items-end justify-center gap-2 border-b-[9px] border-gilt/70 px-4">
               <div className="flex h-36 w-12 items-center justify-center rounded-t-sm border-l-4 border-paper/20 bg-paper text-ink [writing-mode:vertical-rl] font-display text-sm">Por leer</div>
               <div className="flex h-40 w-14 items-center justify-center rounded-t-sm border-l-4 border-paper/20 bg-gilt text-ink [writing-mode:vertical-rl] font-display text-base">Una nueva historia</div>
@@ -73,7 +70,7 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="tu@email.com"
-              className="w-full rounded-xl border border-rule bg-white/70 px-3.5 py-3 text-sm text-ink shadow-sm outline-none transition focus:border-cloth focus:ring-4 focus:ring-cloth/10"
+              className="editorial-input"
             />
           </div>
 
@@ -87,7 +84,7 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="Tu contraseña"
-              className="pr-14 w-full rounded-xl border border-rule bg-white/70 px-3.5 py-3 text-sm text-ink shadow-sm outline-none transition focus:border-cloth focus:ring-4 focus:ring-cloth/10"
+              className="pr-14 editorial-input"
             />
             <button type="button" onClick={() => setMostrarPassword(!mostrarPassword)} aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} aria-pressed={mostrarPassword} className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-xl text-cloth focus-visible:outline-2 focus-visible:outline-cloth">
               {mostrarPassword ? <EyeOff className="size-5" aria-hidden="true" /> : <Eye className="size-5" aria-hidden="true" />}
@@ -96,7 +93,7 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
           </div>
 
           {error && (
-            <div role="alert" className="rounded-xl border border-stamp/30 bg-stamp/8 px-3 py-2 text-sm text-stamp-dark">
+            <div role="alert" className="editorial-alert">
               {error}
             </div>
           )}
@@ -104,7 +101,7 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
           <button
             type="submit"
             disabled={cargando}
-            className="flex w-full items-center justify-center gap-3 rounded-xl bg-cloth px-4 py-3 text-sm font-medium text-surface shadow-lg shadow-cloth/20 transition hover:bg-cloth-dark disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cloth"
+            className="editorial-button w-full"
           >
             <span aria-live="polite">{cargando ? 'Entrando a tu biblioteca…' : 'Entrar a mi biblioteca'}</span>
             {!cargando && <ArrowRight className="size-4" aria-hidden="true" />}
@@ -113,7 +110,7 @@ export default function LoginForm({ confirmationError = false }: { confirmationE
 
         <div className="mt-7 border-t border-rule pt-6 text-center text-sm text-ink">
           ¿No tienes cuenta?{' '}
-          <Link href="/registro" className="font-medium text-cloth transition hover:text-cloth-dark hover:underline">
+          <Link href="/registro" className="editorial-link">
             Crea tu cuenta
           </Link>
         </div>
