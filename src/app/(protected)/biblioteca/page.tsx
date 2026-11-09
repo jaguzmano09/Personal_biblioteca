@@ -12,25 +12,27 @@ export default async function BibliotecaPage() {
   ])
 
   return (
-    <div className="max-w-6xl mx-auto py-10 px-4 sm:px-6">
-      <div className="flex justify-between items-end mb-8 border-b border-rule pb-4">
-        <div>
-          <h1 className="font-display text-3xl">Catálogo</h1>
-          <p className="font-mono text-xs text-ink/60 mt-1">
-            {libros.length} {libros.length === 1 ? 'volumen' : 'volúmenes'} registrados
-          </p>
-        </div>
-        <Link
-          href="/biblioteca/agregar"
-          className="font-mono text-sm border border-ink px-4 py-2 hover:bg-ink hover:text-paper transition-colors"
-        >
-          + Agregar libro
-        </Link>
-      </div>
+    <main className="mx-auto grid max-w-[96rem] gap-10 px-4 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_17rem] lg:py-12 xl:gap-12">
+      <section className="min-w-0" aria-labelledby="library-title">
+        <header className="mb-6 flex flex-wrap items-end justify-between gap-5 border-b border-rule pb-6">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-cloth">Cuaderno de lectura</p>
+            <h1 id="library-title" className="mt-2 font-display text-4xl tracking-tight text-cloth sm:text-6xl">
+              Mi biblioteca
+            </h1>
+            <p className="mt-2 font-display text-lg italic text-ink/80">
+              {libros.length} {libros.length === 1 ? 'volumen registrado' : 'volúmenes registrados'}
+            </p>
+          </div>
+          <Link href="/biblioteca/agregar" className="editorial-button">
+            <span aria-hidden="true">+</span> Agregar libro
+          </Link>
+        </header>
+
+        <LibrosGrid libros={libros} />
+      </section>
 
       <EstadisticasDashboard libros={libros} metaInicial={meta} anioActual={anioActual} />
-
-      <LibrosGrid libros={libros} />
-    </div>
+    </main>
   )
 }

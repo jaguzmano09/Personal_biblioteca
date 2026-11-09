@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, useTransition } from 'react'
-import { Pencil, Check } from 'lucide-react'
+import { Pencil, Check, Sparkle } from 'lucide-react'
 import { guardarMeta, obtenerMeta } from '@/lib/metas'
 import { readingStatistics } from '@/lib/statistics'
 import type { Libro } from '@/lib/types'
@@ -62,92 +62,101 @@ export default function EstadisticasDashboard({ libros, metaInicial, anioActual 
 
   const progreso = meta ? Math.min(100, Math.round((stats.total / meta) * 100)) : 0
 
+  const metaCumplida = meta !== null && stats.total >= meta
+  const numero = new Intl.NumberFormat('es-CO')
+  const metricas = [
+    { label: 'Libros leídos', value: numero.format(stats.total) },
+    { label: 'Páginas leídas', value: numero.format(stats.totalPaginas) },
+    {
+      label: 'Puntuación promedio',
+      value: stats.promedioPuntuacion === null ? '—' : stats.promedioPuntuacion.toLocaleString('es-CO', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }),
+    },
+  ]
+
   return (
-    <div className="border border-rule mb-8">
-      <div className="flex justify-between items-center px-4 pt-4">
-        <p className="font-mono text-[10px] text-ink/50 uppercase tracking-wide">Estadísticas de</p>
+    <aside aria-labelledby="reading-notes-title" className="min-w-0 border-t border-rule pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6">
+      <h2 id="reading-notes-title" className="font-display text-3xl italic text-cloth">Notas al margen</h2>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <label htmlFor="statistics-year" className="font-mono text-xs uppercase tracking-wide text-ink/75">Año de lectura</label>
         <select
-          aria-label="Año de estadísticas"
+          id="statistics-year"
           disabled={isPending}
           value={anioSeleccionado}
           onChange={e => setAnioSeleccionado(Number(e.target.value))}
-          className="font-mono text-sm border border-rule px-2 py-1 bg-paper"
+          className="editorial-input w-auto py-2"
         >
           {aniosDisponibles.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-rule border-b border-rule mt-3">
-        <div className="p-4">
-          <p className="font-mono text-[10px] text-ink/50 uppercase tracking-wide">Leídos en {anioSeleccionado}</p>
-          <p className="font-display text-2xl mt-1">{stats.total}</p>
+      <dl className="mt-4 divide-y divide-rule">
+        {metricas.map(({ label, value }) => (
+          <div key={label} className="flex items-baseline justify-between gap-3 py-3">
+            <dt className="text-sm text-ink/80">{label}</dt>
+            <dd className="font-display text-2xl tabular-nums text-cloth">{value}</dd>
+          </div>
+        ))}
+        <div className="py-3">
+          <dt className="text-sm text-ink/80">Autor más repetido</dt>
+          <dd className="mt-1 wrap-break-word font-display text-lg text-cloth">{stats.autorTop ?? '—'}</dd>
         </div>
-        <div className="p-4">
-          <p className="font-mono text-[10px] text-ink/50 uppercase tracking-wide">Puntuación promedio</p>
-          <p className="font-display text-2xl mt-1">
-            {stats.promedioPuntuacion != null ? stats.promedioPuntuacion.toFixed(1) : '—'}
-          </p>
-        </div>
-        <div className="p-4">
-          <p className="font-mono text-[10px] text-ink/50 uppercase tracking-wide">Autor más repetido</p>
-          <p className="font-display text-lg mt-1 truncate">{stats.autorTop ?? '—'}</p>
-        </div>
-        <div className="p-4">
-          <p className="font-mono text-[10px] text-ink/50 uppercase tracking-wide">Páginas leídas</p>
-          <p className="font-display text-2xl mt-1">{stats.totalPaginas.toLocaleString()}</p>
-        </div>
-      </div>
+      </dl>
 
-      {error && <p role="alert" className="px-4 py-2 text-stamp">{error}</p>}
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-2">
-          <p className="font-mono text-[10px] text-ink/50 uppercase tracking-wide">
-            Meta {anioSeleccionado}
-          </p>
-
-          {cargandoMeta ? (
-            <span className="font-mono text-xs text-ink/40">Cargando...</span>
-          ) : editandoMeta ? (
-            <div className="flex items-center gap-1.5">
-              <input
-                type="number"
-                aria-label="Número de libros de la meta"
-                max="100000"
-                step="1"
-                min="1"
-                autoFocus
-                value={metaInput}
-                onChange={e => setMetaInput(e.target.value)}
-                className="w-16 border border-rule px-1.5 py-0.5 text-xs font-mono"
-              />
-              <button aria-label="Guardar meta" onClick={handleGuardarMeta} disabled={isPending} className="text-cloth-dark">
-                <Check className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setEditandoMeta(true)}
-              className="flex items-center gap-1 font-mono text-xs text-ink/50 hover:text-ink"
-            >
-              {meta ? `${meta} libros` : 'Definir meta'} <Pencil className="w-3 h-3" />
+      <section aria-labelledby="reading-goal-title" aria-busy={cargandoMeta || isPending} className="mt-4 border-t border-rule pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 id="reading-goal-title" className="font-mono text-xs uppercase tracking-wide text-ink/75">Meta {anioSeleccionado}</h3>
+          {!cargandoMeta && !editandoMeta && (
+            <button type="button" onClick={() => setEditandoMeta(true)} className="editorial-link inline-flex min-h-11 items-center gap-1.5 text-xs">
+              {meta ? 'Editar meta' : 'Definir meta'} <Pencil aria-hidden="true" className="size-3" />
             </button>
           )}
         </div>
 
-        {meta ? (
-          <div className="h-2 bg-rule/30 w-full">
-            <div className="h-full bg-cloth transition-all" style={{ width: `${progreso}%` }} />
-          </div>
-        ) : (
-          !cargandoMeta && <p className="font-mono text-xs text-ink/40">Define cuántos libros quieres leer este año.</p>
+        {error && <p role="alert" className="editorial-alert my-2">{error}</p>}
+        {cargandoMeta && <p role="status" className="mt-2 text-sm text-ink/75">Cargando meta…</p>}
+
+        {!cargandoMeta && editandoMeta && (
+          <form className="my-3 flex items-center gap-2" onSubmit={e => { e.preventDefault(); handleGuardarMeta() }}>
+            <input
+              type="number"
+              aria-label="Número de libros de la meta"
+              required
+              max="100000"
+              step="1"
+              min="1"
+              autoFocus
+              value={metaInput}
+              onChange={e => setMetaInput(e.target.value)}
+              className="editorial-input min-w-0"
+            />
+            <button type="submit" aria-label="Guardar meta" disabled={isPending} className="editorial-button">
+              <Check aria-hidden="true" className="size-4" />
+            </button>
+          </form>
         )}
 
-        {meta && !cargandoMeta && (
-          <p className="font-mono text-xs text-ink/50 mt-1">
-            {stats.total} de {meta} · {progreso}%
-          </p>
+        {meta !== null && !cargandoMeta ? (
+          <div className="mt-3">
+            {metaCumplida && (
+              <div className="my-5 flex items-center justify-center gap-2 text-stamp-dark">
+                <span className="inline-block -rotate-3 rounded-[50%] border-4 border-double border-stamp-dark px-5 py-2 text-center font-display text-lg leading-tight">
+                  Meta cumplida
+                </span>
+                <Sparkle aria-hidden="true" className="size-5 shrink-0 fill-gilt text-gilt" />
+              </div>
+            )}
+            <div role="progressbar" aria-label="Progreso de la meta anual" aria-valuenow={progreso} className="h-1.5 overflow-hidden rounded-full bg-rule/55">
+              <div className="h-full bg-cloth motion-safe:transition-all" style={{ width: `${progreso}%` }} />
+            </div>
+            <p className="mt-2 font-display text-lg italic text-ink/85">{numero.format(stats.total)} de {numero.format(meta)} libros</p>
+          </div>
+        ) : !cargandoMeta && !editandoMeta && (
+          <p className="mt-2 text-sm leading-relaxed text-ink/75">¿Cuántos libros te gustaría leer este año?</p>
         )}
-      </div>
-    </div>
+      </section>
+    </aside>
   )
 }

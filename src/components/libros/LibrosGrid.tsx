@@ -64,21 +64,23 @@ export default function LibrosGrid({ libros }: { libros: Libro[] }) {
       />
 
       {anioFiltro !== 'Todos' && (
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="mb-4 text-sm text-ink/75">
           {librosFiltrados.length} {librosFiltrados.length === 1 ? 'libro registrado' : 'libros registrados'} en {anioFiltro}
         </p>
       )}
 
       {librosFiltrados.length === 0 ? (
-        <p className="text-center text-gray-400 py-12">No se encontraron libros.</p>
+        <p className="border-y border-rule py-12 text-center font-display text-xl text-ink/80">
+          {libros.length === 0 ? 'Tu cuaderno empieza con el primer libro.' : 'No se encontraron libros.'}
+        </p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-5 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4">
           {visibles.map(libro => (
             <LibroCard key={libro.id} libro={libro} />
           ))}
         </div>
       )}
-      {visibles.length < librosFiltrados.length && <button type="button" className="border px-4 py-2 mt-4" onClick={() => setPagina(p => p + 1)}>Mostrar más libros</button>}
+      {visibles.length < librosFiltrados.length && <button type="button" className="editorial-link mt-6 min-h-11 px-2" onClick={() => setPagina(p => p + 1)}>Mostrar más libros</button>}
     </div>
   )
 }
