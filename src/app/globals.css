@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-display: "Fraunces", serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  --font-sans: var(--type-body), system-ui, sans-serif;
+  --font-display: var(--type-editorial), Georgia, serif;
+  --font-mono: var(--type-catalog), monospace;
 
   --color-paper: var(--brand-paper);
   --color-ink: var(--brand-ink);
@@ -21,5 +22,28 @@
 body {
   background-color: var(--color-paper);
   color: var(--color-ink);
-  font-family: system-ui, sans-serif;
+  font-family: var(--type-body), system-ui, sans-serif;
+}
+
+@layer components {
+  .editorial-input {
+    @apply w-full rounded-xl border border-ink/55 bg-surface px-3.5 py-3 text-sm text-ink placeholder:text-ink/65 focus:border-cloth;
+  }
+
+  .editorial-button {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-cloth px-4 py-3 text-sm font-semibold text-surface hover:bg-cloth-dark disabled:cursor-not-allowed disabled:opacity-70;
+  }
+
+  .editorial-link {
+    @apply rounded-sm font-medium text-cloth underline decoration-cloth/45 underline-offset-4 hover:decoration-cloth;
+  }
+
+  .editorial-alert {
+    @apply rounded-xl border border-stamp/40 bg-stamp/8 px-3 py-2 text-sm text-stamp-dark;
+  }
+
+  :where(a, button, input, select, textarea):focus-visible {
+    outline: 2px solid var(--brand-cloth);
+    outline-offset: 3px;
+  }
 }
