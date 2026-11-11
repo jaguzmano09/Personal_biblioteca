@@ -22,12 +22,19 @@ try {
     await new Promise(resolve => setTimeout(resolve, 100))
   }
   assert.ok(ready, output)
-  for (const path of ['/biblioteca', '/biblioteca/datos', '/biblioteca/anything.jpg', '/']) {
+  for (const path of ['/biblioteca', '/biblioteca/datos', '/biblioteca/anything.jpg']) {
     const response = await fetch(origin + path, { redirect: 'manual' })
     assert.equal(response.status, 307, path)
     assert.equal(new URL(response.headers.get('location'), origin).pathname, '/login')
     assert.match(response.headers.get('cache-control'), /no-store/)
   }
+  const home = await fetch(origin)
+  assert.equal(home.status, 200)
+  assert.match(home.headers.get('cache-control'), /no-store/)
+  const homeHtml = await home.text()
+  assert.match(homeHtml, /Lo que lees también te escribe/)
+  assert.match(homeHtml, /href="\/registro"/)
+  assert.match(homeHtml, /sample-note/)
   const cover = await fetch(`${origin}/api/covers?url=https://example.com/cover.png`)
   assert.equal(cover.status, 401)
   assert.match(cover.headers.get('cache-control'), /no-store/)
