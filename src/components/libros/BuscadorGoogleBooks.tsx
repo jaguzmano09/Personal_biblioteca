@@ -1,9 +1,8 @@
 'use client'
 
-import { safeCover } from '@/lib/covers'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Search, Loader2 } from 'lucide-react'
-import { useDebounce } from '@/hooks/useDebounce'
+import PortadaLibro from './PortadaLibro'
 import type { GoogleBookResult } from '@/lib/types'
 
 interface Props {
@@ -16,92 +15,175 @@ export default function BuscadorGoogleBooks({ onSeleccionar }: Props) {
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const debouncedQuery = useDebounce(query, 400)
+  const [busqueda, setBusqueda] = useState<string | null>(null)
+  const solicitud = useRef<AbortController | null>(null)
 
-  useEffect(() => {
-    if (debouncedQuery.trim().length < 2) {
-      setResultados([])
-      setCargando(false)
-      setError(null)
-      return
-    }
+  useEffect(() => () => solicitud.current?.abort(), [])
 
-    let cancelado = false
+  async function buscar(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const consulta = query.trim()
+    if (consulta.length < 2 || solicitud.current) return
     const controller = new AbortController()
+    solicitud.current = controller
     setCargando(true)
     setError(null)
+    setResultados([])
+    setBusqueda(consulta)
 
-    fetch(`/api/google-books?q=${encodeURIComponent(debouncedQuery)}&maxResults=10`, { signal: controller.signal })
-      .then(async res => {
-        if (!res.ok) {
-          const body = await res.json()
-          throw new Error(body.error || 'No se pudo consultar Google Books.')
+    try {
+      const res = await fetch(
+        `/api/google-books?q=${encodeURIComponent(consulta)}&maxResults=10`,
+        {
+          signal: controller.signal,
+          cache: 'no-store'
         }
-
-        const libros = await res.json() as GoogleBookResult[]
-        if (!cancelado) setResultados(libros)
-      })
-      .catch(error => {
-        if (!cancelado) { setResultados([]); setError(error instanceof Error ? error.message : 'No se pudo conectar con Google Books.') }
-      })
-      .finally(() => {
-        if (!cancelado) setCargando(false)
-      })
-
-    return () => {
-      cancelado = true
-      controller.abort()
+      )
+      const body = await res.json()
+      if (!res.ok)
+        throw new Error(body.error || 'No se pudo consultar Google Books.')
+      setResultados(body as GoogleBookResult[])
+    } catch (err) {
+      if (controller.signal.aborted) return
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo conectar con Google Books.'
+      )
+    } finally {
+      if (!controller.signal.aborted) {
+        setCargando(false)
+        solicitud.current = null
+      }
     }
-  }, [debouncedQuery])
+  }
 
   return (
-    <div className="w-full">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <input
-          aria-label="Buscar libros por título, autor o ISBN"
-          maxLength={200}
-          type="text"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Busca por título, autor o ISBN..."
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    <section aria-label="Buscar una edición" className="min-w-0">
+      <form onSubmit={buscar} role="search" className="space-y-3">
+        <label htmlFor="buscar-libro" className="block font-medium">
+          Título, autor o ISBN
+        </label>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="relative min-w-0 flex-1">
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3.5 top-4 h-5 w-5 text-cloth"
+            />
+            <input
+              id="buscar-libro"
+              aria-describedby="buscar-ayuda"
+              required
+              minLength={2}
+              maxLength={200}
+              type="search"
+              enterKeyHint="search"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="El próximo libro de tu biblioteca"
+              className="editorial-input min-h-12 pl-11 text-base"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={cargando || query.trim().length < 2}
+            className="editorial-button min-h-12 sm:shrink-0"
+          >
+            {cargando && (
+              <Loader2
+                aria-hidden="true"
+                className="h-4 w-4 motion-safe:animate-spin"
+              />
+            )}
+            {cargando
+              ? 'Buscando…'
+              : error
+                ? 'Reintentar búsqueda'
+                : 'Buscar libro'}
+          </button>
+        </div>
+        <p id="buscar-ayuda" className="text-sm leading-relaxed text-ink/75">
+          Al buscar, tu consulta se envía a Google Books. Puedes comparar las
+          ediciones antes de guardar.
+        </p>
+        <img
+          src="/attribution/google-books-poweredby.png"
+          width={62}
+          height={30}
+          alt="Con tecnología de Google"
         />
-        {cargando && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
-        )}
-      </div>
+      </form>
 
-      {error && <p role="alert" className="mt-2 text-sm text-red-500">{error}</p>}
+      <p role="status" className="mt-5 text-sm text-cloth">
+        {cargando
+          ? 'Consultando Google Books…'
+          : !error && busqueda && resultados.length > 0
+            ? `${resultados.length} ediciones encontradas para «${busqueda}».`
+            : ''}
+      </p>
+      {error && (
+        <p role="alert" className="editorial-alert mt-3">
+          {error}
+        </p>
+      )}
+      {!cargando && !error && busqueda && resultados.length === 0 && (
+        <div role="status" className="border-y border-rule py-8">
+          <h2 className="font-display text-2xl">
+            Esta búsqueda aún no encuentra su libro
+          </h2>
+          <p className="mt-2 text-sm text-ink/75">
+            Prueba con menos palabras, el apellido del autor o el ISBN de tu
+            edición.
+          </p>
+        </div>
+      )}
 
       {resultados.length > 0 && (
-        <ul className="mt-2 border border-gray-200 rounded-lg divide-y max-h-80 overflow-y-auto">
+        <ul className="mt-3 divide-y divide-rule border-y border-rule">
           {resultados.map(libro => (
-            <li
-              key={libro.google_books_id}
-
-              className="hover:bg-gray-50"
-            >
-              <button type="button" onClick={() => onSeleccionar(libro)} className="flex gap-3 p-3 w-full text-left">
-              {safeCover(libro.portada_url) ? (
-                <img src={safeCover(libro.portada_url)!} referrerPolicy="no-referrer" loading="lazy" alt={libro.titulo} className="w-10 h-14 object-cover rounded" />
-              ) : (
-                <div className="w-10 h-14 bg-gray-200 rounded" />
-              )}
-              <div className="min-w-0">
-                <p className="font-medium text-sm truncate">{libro.titulo}</p>
-                <p className="text-xs text-gray-500 truncate">
-                  {libro.autores.join(', ') || 'Autor desconocido'}
-                </p>
-                {libro.fecha_publicacion && (
-                  <p className="text-xs text-gray-400">{libro.fecha_publicacion}</p>
-                )}
-              </div>
+            <li key={libro.google_books_id} className="hover:bg-cloth/5">
+              <button
+                type="button"
+                onClick={() => onSeleccionar(libro)}
+                className="flex w-full gap-4 px-1 py-5 text-left focus-visible:bg-cloth/5 sm:gap-5 sm:px-3"
+              >
+                <PortadaLibro url={libro.portada_url} />
+                <span className="min-w-0 flex-1 space-y-1.5">
+                  <span className="block break-words font-display text-xl leading-snug text-cloth">
+                    {libro.titulo}
+                  </span>
+                  <span className="block break-words text-sm">
+                    {libro.autores.join(', ') || 'Autor desconocido'}
+                  </span>
+                  <span className="block break-words text-sm text-ink/75">
+                    {[libro.editorial, libro.fecha_publicacion]
+                      .filter(Boolean)
+                      .join(' · ') || 'Edición sin datos de publicación'}
+                  </span>
+                  {libro.isbn && (
+                    <span className="block break-all text-xs text-ink/75">
+                      ISBN {libro.isbn}
+                    </span>
+                  )}
+                  <span className="block pt-1 text-sm font-medium text-cloth underline decoration-cloth/40 underline-offset-4">
+                    Elegir esta edición
+                  </span>
+                </span>
               </button>
+              <a
+                href={`https://books.google.com/books?id=${encodeURIComponent(libro.google_books_id)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                referrerPolicy="no-referrer"
+                className="editorial-link mb-3 ml-21 inline-flex min-h-11 items-center pr-2 text-sm sm:ml-24"
+              >
+                Ver edición en Google Books{' '}
+                <span className="sr-only">(abre otra pestaña)</span>
+              </a>
             </li>
           ))}
         </ul>
       )}
-    </div>
+    </section>
   )
 }
