@@ -1,18 +1,30 @@
 'use server'
 
 import type { GoogleBookResult, Libro } from './types'
-import { bookChanges, googleBook, personalData, uuid } from './validation'
+import { bookChanges, googleBook, personalData, uuid, ValidationError } from './validation'
 import { requireUser } from './session'
 import { revalidatePath } from 'next/cache'
 
 export async function guardarLibro(libroGoogle: GoogleBookResult, datosPersonales: unknown) {
   const { supabase, user } = await requireUser()
-  const payload = { ...googleBook(libroGoogle), ...personalData(datosPersonales), user_id: user.id }
+  let payload
+  try {
+    payload = { ...googleBook(libroGoogle), ...personalData(datosPersonales), user_id: user.id }
+  } catch (error) {
+    if (error instanceof ValidationError) return { ok: false as const, error: error.message }
+    throw error
+  }
   const { data, error } = await supabase.from('libros').insert(payload).select().single()
-  if (error) throw new Error(error.code === '23505'
-    ? 'Ya tienes este libro registrado en tu biblioteca.' : 'No se pudo guardar el libro.')
+  if (error) {
+    return {
+      ok: false as const,
+      error: error.code === '23505'
+        ? 'Ya tienes esta edición en tu biblioteca. Tus anotaciones siguen aquí para que puedas copiarlas antes de volver.'
+        : 'No se pudo guardar el libro. Tus datos siguen aquí para que puedas reintentarlo.'
+    }
+  }
   revalidatePath('/biblioteca')
-  return data as Libro
+  return { ok: true as const, libro: data as Libro }
 }
 
 export async function actualizarLibro(id: string, cambios: unknown) {

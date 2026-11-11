@@ -42,8 +42,24 @@ body {
     @apply rounded-xl border border-stamp/40 bg-stamp/8 px-3 py-2 text-sm text-stamp-dark;
   }
 
-  :where(a, button, input, select, textarea):focus-visible {
+  :where(a, button, input, select, textarea, summary):focus-visible {
     outline: 2px solid var(--brand-cloth);
     outline-offset: 3px;
   }
+}
+
+.reading-bookmark {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
+  transform-origin: top;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reading-bookmark {
+    animation: place-bookmark 450ms ease-out;
+  }
+}
+
+@keyframes place-bookmark {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
 }
