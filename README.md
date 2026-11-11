@@ -8,6 +8,8 @@ Users can discover books through Google Books, maintain their own catalog, recor
 
 ## Features
 
+- An illustrated public welcome with Tinteruna's story and a temporary, browser-only reading journal preview.
+- A shared literary identity across access, library, reading notes and data controls, with mobile navigation.
 - Email/password registration, email confirmation and cookie-based sessions.
 - Private book creation, editing and deletion.
 - Google Books search by title, author or ISBN, with a server-side API key.

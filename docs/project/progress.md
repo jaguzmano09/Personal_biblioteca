@@ -8,8 +8,9 @@ Tinteruna is a private reading journal with a Spanish interface, editorial typog
 
 | Area | Implemented locally | Verification and remaining work |
 | --- | --- | --- |
+| Public welcome and identity | Illustrated story, interactive temporary journal preview, shared literary typography and magical-realism artwork | Anonymous production pages and isolated components reviewed at four widths; zero axe findings in checked views. Physical-device review remains open. |
 | Access | Registration, confirmation, sign-in and sign-out | Anonymous boundaries checked locally. Real authenticated recovery and complete account lifecycle remain open. |
-| Library | Filters, sorting, annual goals, reading-state detail and inline notes | Existing regression checks cover data validation and PostgreSQL isolation. Real authenticated note persistence and device review remain open. |
+| Library | Current-reading continuation, mobile navigation, filters, sorting, annual goals, reading-state detail and inline notes | Regression checks cover data validation and PostgreSQL isolation. Isolated browser checks cover filters, goals, note retry and all four states. Real authenticated persistence and device review remain open. |
 | Discovery and addition | Explicit Google Books search, edition comparison, optional personal note, recoverable save errors and bookmark confirmation | Isolated browser checks cover 360, 390, 768 and 1366 px, short viewports and keyboard focus. Real provider/save persistence remains open. |
 | Privacy controls | Private JSON export and a protected data/contact page | Tests cover ownership filters, pagination, anonymous denial and safe failure. Real authenticated export remains open. |
 | Launch preparation | Data-flow inventory, readiness assessment and internal legal drafts | Approved notices, adolescent safeguards, retention, recovery/closure operations and provider evidence remain open. |
@@ -17,9 +18,21 @@ Tinteruna is a private reading journal with a Spanish interface, editorial typog
 
 ## Publication status
 
-The historical handoff reported publication of `ae7a23f`. During this review, a read-only remote check confirmed GitHub `main` at `b3742bd`, which includes the subsequent mobile discovery, account export and local-metadata cleanup commits below. That confirms Git publication. Hosted deployment state, private environment configuration and authenticated acceptance checks still require separate evidence. The documentation reorganization is the current increment on local `main`.
+The historical handoff reported publication of `ae7a23f`. Before the identity increment, local `main` and its tracking reference were at `619106b`, including documentation organization and the earlier mobile/privacy changes below. The identity increment is committed locally on `main`; this work does not publish or deploy it. Hosted deployment state, private environment configuration and authenticated acceptance checks require separate evidence.
 
 ## Change record
+
+### November 10, 2026 — Public welcome and platform identity
+
+- Replaced the anonymous root redirect with a public introduction, Tinteruna's reading-journal story, an interactive preview, real feature explanations and questions. Signed-in readers still enter their library.
+- Added original magical-realism artwork: an open book becomes an Andean landscape and an ink river. Applied the identity across access, the library, empty states, notes, addition, errors and data controls.
+- Reworked mobile and desktop navigation, current-reading continuation, labelled search and filters, password visibility, submission feedback and focused registration confirmation.
+- Preserved existing book actions, decimal scores, note conflict handling, secure covers, session/ownership checks and private JSON export. No database migration, new product dependency or provider configuration change was introduced.
+- Kept the public preview temporary and local to page memory. No save request, storage write or personal contact value is part of this welcome.
+- Consulted Skill Issue again and installed reviewed, pinned Impeccable and community XSS guidance. Reused frontend, responsive and testing skills. See [design decisions and artwork prompt](../design/frontend-skills.md) for provenance and the reusable contract.
+- Verification: 36 regression tests, TypeScript and production build, anonymous smoke checks, and browser checks of production public pages plus actual private components with fixture action boundaries. Four widths (360, 390, 768 and 1440 px), all reading states, filter/reset/sort, annual goals, note failure/retry, registration confirmation, literal markup rendering and preview privacy were checked. Axe reported zero findings in the checked views. Real account creation, authenticated persistence and export remain unverified against a live service.
+- Exposure checks covered 86 versionable files and 43 built client resources, with no configured operator values or matching credential patterns found. Real private values were omitted from output. New commits use a project identity and a reserved `.invalid` email through per-command Git configuration; personal Git settings are unchanged. Existing historical exposure remains documented in the privacy readiness assessment; this increment does not rewrite history.
+- Commit sequence: `feat(design): establish the illustrated Tinteruna identity`; `feat(home): introduce a public reading journal welcome`; `feat(auth): carry the literary identity through account access`; `feat(library): unify the private reading experience`; `docs(design): record identity decisions and verification`.
 
 ### November 10, 2026 — Repository documentation and privacy review
 
@@ -53,4 +66,4 @@ Verification passed 36 tests, TypeScript, the production build, anonymous smoke 
 3. Implement and review the adolescent registration safeguards for the intended Colombia audience.
 4. Finalize Spanish legal notices and terms, consent/acceptance controls where applicable, and pre-registration links after the operational facts are confirmed.
 5. Address the recorded security and provider findings, then review public-launch readiness.
-6. Continue the mobile welcome, library and detail refinements described in the historical handoff.
+6. Review the implemented welcome and library on physical phones, then refine the identity using reader feedback and observed task completion.
