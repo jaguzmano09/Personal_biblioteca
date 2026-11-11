@@ -36,6 +36,14 @@ Use distinct accounts A and B with independent browser sessions, plus a signed-o
 
 ## Public-user operations
 
-Before opening registration, publish an accurate privacy notice and provide a real support/contact channel. Decide retention periods, backups and account/content deletion handling. Document how an administrator fulfills export/deletion requests while self-service screens are absent. Deleting an Auth user cascades application books, goals and quota data; provider logs/backups follow their separately configured retention policies.
+### Operator contact configuration
+
+Set `TINTERUNA_OPERATOR_NAME` and `TINTERUNA_PRIVACY_EMAIL` as server-only environment variables. The protected data page renders the contact section when both are configured. `TINTERUNA_OPERATOR_CITY`, `TINTERUNA_OPERATOR_ADDRESS` and `TINTERUNA_OPERATOR_PHONE` hold the operator details needed when preparing the approved legal notice. Keep actual values in the ignored `.env.local` file and in appropriately scoped hosting environment settings. The example file contains variable names with empty values.
+
+The rendered contact details are visible to the people who can access the relevant page. Publishing a legal notice containing contact details makes those details readable by its visitors. Review contact arrangements before publication. Earlier Git history can retain previously published contact information even after the current documentation is updated.
+
+The protected JSON export includes the session owner's books, notes, quotations, goals and basic account identity. It uses existing owner-scoped reads with pagination and private/no-store responses. It requires no privileged API key. Check the download and failure states with an isolated signed-in account before publication.
+
+Before opening registration, publish an accurate privacy notice and provide a real support/contact channel. Decide retention periods, backups and account/content deletion handling. Document how an administrator verifies and fulfills account correction, deletion and withdrawal requests. Deleting an Auth user cascades application books, goals and quota data. Provider logs/backups follow their separately configured retention policies.
 
 The repository checks do not certify legal compliance or complete infrastructure security. The production Auth/hosting settings and acceptance tests above must be verified in the deployed environment.

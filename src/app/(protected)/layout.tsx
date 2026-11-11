@@ -1,4 +1,5 @@
 import Wordmark from '@/components/ui/Wordmark'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { cerrarSesion } from '@/lib/auth'
@@ -15,6 +16,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
         <Wordmark href="/biblioteca" />
         <div className="flex min-w-0 flex-wrap items-center gap-3 text-xs text-ink/75">
           <span className="min-w-0 break-all">{user.email}</span>
+          <Link href="/biblioteca/datos" className="editorial-link inline-flex min-h-11 items-center">Tus datos</Link>
           <form action={cerrarSesion}>
             <button className="editorial-link min-h-11 px-2">
               salir

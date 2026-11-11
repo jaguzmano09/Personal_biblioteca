@@ -46,7 +46,7 @@ En los secretos de Edge Functions del proyecto, agrega:
 | Nombre | Valor |
 | --- | --- |
 | `BREVO_API_KEY` | La nueva clave API de Brevo |
-| `BREVO_SENDER_EMAIL` | `javierguz915@gmail.com`, remitente verificado |
+| `BREVO_SENDER_EMAIL` | El correo del remitente verificado, guardado como secreto del proveedor |
 | `SEND_EMAIL_HOOK_SECRET` | El secreto del hook generado por Supabase |
 | `AUTH_EMAIL_CALLBACK_URL` | `https://personal-biblioteca.vercel.app/api/auth/callback` |
 

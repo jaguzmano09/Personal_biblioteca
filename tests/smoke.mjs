@@ -22,7 +22,7 @@ try {
     await new Promise(resolve => setTimeout(resolve, 100))
   }
   assert.ok(ready, output)
-  for (const path of ['/biblioteca', '/biblioteca/anything.jpg', '/']) {
+  for (const path of ['/biblioteca', '/biblioteca/datos', '/biblioteca/anything.jpg', '/']) {
     const response = await fetch(origin + path, { redirect: 'manual' })
     assert.equal(response.status, 307, path)
     assert.equal(new URL(response.headers.get('location'), origin).pathname, '/login')
@@ -34,6 +34,9 @@ try {
   const search = await fetch(`${origin}/api/google-books?q=test`)
   assert.equal(search.status, 401)
   assert.match(search.headers.get('cache-control'), /no-store/)
+  const accountExport = await fetch(`${origin}/api/account/export`)
+  assert.equal(accountExport.status, 401)
+  assert.match(accountExport.headers.get('cache-control'), /no-store/)
   const callback = await fetch(`${origin}/api/auth/callback`, { redirect: 'manual' })
   assert.equal(callback.status, 307)
   assert.equal(callback.headers.get('location'), `${origin}/login?error=confirmation`)
