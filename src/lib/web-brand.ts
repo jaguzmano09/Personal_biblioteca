@@ -2,7 +2,8 @@ import { brand } from '../../supabase/functions/_shared/brand.js'
 
 export const webBrand = {
   name: 'Tinteruna',
-  description: 'Tu biblioteca personal para guardar historias y seguir tus lecturas.',
+  description:
+    'Los libros que lees. Las historias que te habitan. Tu biblioteca y diario de lectura personal.',
   colors: {
     ...brand.colors,
     paper: '#F5EDE0',
@@ -12,6 +13,6 @@ export const webBrand = {
     stamp: '#A65C4B',
     'stamp-dark': '#863F32',
     gilt: '#B69A62',
-    surface: '#FFFAF2',
-  },
+    surface: '#FFFAF2'
+  }
 }
