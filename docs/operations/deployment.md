@@ -1,4 +1,4 @@
-# Public deployment checklist
+# Deployment and release checks
 
 ## Database and application rollout
 

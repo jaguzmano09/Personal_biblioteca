@@ -1,8 +1,8 @@
-# Frontend skills used for this increment
+# Frontend skills and design decisions
 
 On 2026-11-10 the Skill Issue MCP at `https://skill-issue.in/api/mcp` responded to `initialize`, `tools/list`, `recommend_skills` and `get_skill`. It was registered in personal Codex configuration using `codex mcp add skill-issue --url https://skill-issue.in/api/mcp`.
 
-The upstream instruction files were reviewed before installation. The Codex skill installer downloaded the following pinned packages into the personal `~/.agents/skills` directory. Their installed `SKILL.md` files were read and applied during this session. Codex can discover this directory automatically on the next turn. The server registration and downloaded packages are machine-local.
+The upstream instruction files were reviewed before installation. The Codex skill installer downloaded the following pinned packages into the personal `~/.agents/skills` directory. Their installed `SKILL.md` files were read and applied during the frontend increment, and the skills are discoverable in this environment. The server registration and downloaded packages are machine-local.
 
 | Skill and source | Revision | Application |
 | --- | --- | --- |

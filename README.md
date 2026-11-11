@@ -1,6 +1,8 @@
-# Mi Biblioteca
+# Tinteruna
 
 A private reading journal and personal book catalog built with Next.js, React and Supabase. The interface is in Spanish; this documentation is in English.
+
+Start with the [documentation index](docs/README.md) for operational guides and design/privacy decisions. [Platform progress](docs/project/progress.md) records completed increments, verification and pending work.
 
 Users can discover books through Google Books, maintain their own catalog, record reviews and reading dates, and track annual reading goals. Public registration does **not** make anyone's library public.
 
@@ -14,6 +16,7 @@ Users can discover books through Google Books, maintain their own catalog, recor
 - Reading year/month, physical/digital format and book provenance.
 - Catalog search, filters, sorting and incremental display of 50 books.
 - Annual goals and statistics based **only on completed books** in the selected year.
+- A protected data page with a private JSON export of books, notes, quotations, goals and basic account identity.
 
 ## Stack and requirements
 
@@ -56,6 +59,8 @@ All settings used by this application are **server-only**. Do not add `NEXT_PUBL
 | `SUPABASE_ANON_KEY` | Yes | Supabase `anon` JWT or publishable key; RLS must be active |
 | `SITE_URL` | Yes | Exact application origin, e.g. `https://example.com`; no path/query |
 | `GOOGLE_BOOKS_API_KEY` | Recommended | Google Books API key used only by the server |
+| `TINTERUNA_OPERATOR_NAME`, `TINTERUNA_PRIVACY_EMAIL` | For the data-page contact | Operator identity and privacy/support channel, configured privately |
+| `TINTERUNA_OPERATOR_CITY`, `TINTERUNA_OPERATOR_ADDRESS`, `TINTERUNA_OPERATOR_PHONE` | For preparing legal notices | Operator contact details, configured privately |
 
 Never use `service_role` or an `sb_secret_` key in this application. Privileged keys can bypass RLS. Configuration rejects known privileged key formats. HTTP is accepted for `SITE_URL` only on localhost/127.0.0.1.
 
@@ -70,10 +75,10 @@ The initial migration supports a new project or the existing `libros`/`metas_lec
 
 1. Back up the existing database and test the migration on a staging copy.
 2. Inspect legacy rows for duplicate `(user_id, google_books_id)` pairs, orphaned owners, invalid scores/dates and oversized text. Resolve them deliberately before migrating. No records or stored cover URLs are deleted or rewritten to pass validation.
-3. Run both SQL files **in order** in the Supabase SQL Editor as the database owner. If the original 001 failed on `libros_values_valid`, issue `ROLLBACK`, retry the corrected 001 from this revision, then run 002. If 001 already completed successfully, run only 002. Alternatively, apply it using your established Supabase CLI migration workflow. This repository does not contain a linked CLI project configuration.
+3. Run both SQL files **in order** in the Supabase SQL Editor as the database owner. If the original 001 failed on `libros_values_valid`, issue `ROLLBACK`, retry the corrected 001 from this revision, then run 002. If 001 already completed successfully, run only 002. Alternatively, apply it using your established Supabase CLI migration workflow. Project configuration is in `supabase/config.toml`, with local CLI linkage stored under the ignored `supabase/.temp/` directory.
 4. Confirm the transaction committed successfully and the new policies, constraints and `consume_book_search()` function exist.
 5. Deploy the matching application code **after** the migration.
-6. Test with two real accounts and an anonymous client as described in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+6. Test with two real accounts and an anonymous client as described in the [deployment guide](docs/operations/deployment.md).
 
 The migration is transactional: incompatible legacy data causes it to abort. If the SQL Editor leaves a failed transaction open, issue `ROLLBACK` before correcting data and retrying. Existing custom tables or additional exposed schemas require their own review.
 
@@ -105,7 +110,7 @@ The proxy checks all resolved IP addresses and each redirect, blocks internal/sp
 
 Security headers disable framing, MIME sniffing, camera/microphone/location permissions and referrer disclosure. The CSP currently restricts framing, objects, base URLs and form destinations; it is **not a complete nonce-based script CSP**.
 
-Do not log passwords, tokens, search queries or reading notes. Define your public privacy notice, retention/deletion process and support contact before accepting public users. Account deletion/export and password recovery do not yet have self-service screens; account administration currently happens through Supabase.
+Do not log passwords, tokens, search queries or reading notes. Define your public privacy notice, retention/deletion process and support contact before accepting public users. Account export is available through the protected data page. Account closure and password recovery still require complete user workflows and operational verification. See [privacy readiness](docs/security/privacy-readiness.md) for the current findings and [legal drafts](docs/legal/drafts.md) for publication work.
 
 ## Architecture
 
@@ -113,13 +118,15 @@ Do not log passwords, tokens, search queries or reading notes. Define your publi
 src/
   app/
     (auth)/                    Login and registration pages
-    (protected)/biblioteca/    Catalog, add-book and detail pages
+    (protected)/biblioteca/    Catalog, add-book, detail and data pages
+    api/account/export/        Private JSON export
     api/auth/callback/         Email confirmation callback
     api/google-books/          Authenticated, rate-limited search
     api/covers/                Authenticated image intermediary
   components/
     auth/                      Authentication forms
     libros/                    Catalog, dashboard and reading forms
+    privacy/                   Data export and contact interface
   hooks/useDebounce.ts
   lib/
     auth.ts                    Authentication server actions
@@ -154,7 +161,7 @@ These checks do not replace staging tests against Supabase Auth, PostgREST and y
 ## Deployment
 
 For optional authentication email delivery through the Brevo HTTP API instead of SMTP, see
-[`docs/BREVO_API.md`](docs/BREVO_API.md). The function and signed Auth hook require separate
+the [authentication email guide](docs/operations/auth-email.md). The function and signed Auth hook require separate
 Supabase deployment/configuration; merging this repository does not activate email delivery.
 
 Use a Node-compatible Next.js host such as Vercel. Configure server environment variables, apply the migration, and configure Supabase Auth's Site URL and exact confirmation callback URL:
@@ -163,11 +170,11 @@ Use a Node-compatible Next.js host such as Vercel. Configure server environment 
 https://your-domain.example/api/auth/callback
 ```
 
-Enable email confirmation, configure production SMTP and appropriate Auth rate limits/password requirements. See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for release checks and operational requirements. This repository does not automatically change your Supabase or hosting account settings.
+Enable email confirmation, configure production delivery and appropriate Auth rate limits/password requirements. See the [deployment guide](docs/operations/deployment.md) for release checks and operational requirements. This repository does not automatically change your Supabase or hosting account settings.
 
 ## Current boundaries
 
 - Books are fetched in bounded batches to avoid Supabase's response cap; the full per-user catalog is still loaded for local filtering/statistics. Large catalogs will eventually require server-side pagination and aggregate queries.
-- No social/public-library sharing, recommendations or self-service account export/deletion.
+- Social/public-library sharing, recommendations and self-service account closure remain future work.
 - Reading history records one reading year/month per book, not multiple rereads.
 - Application strings remain in Spanish.
