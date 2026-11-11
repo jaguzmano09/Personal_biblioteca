@@ -33,21 +33,22 @@ export default function AgregarLibroPage() {
         <ArrowLeft className="w-4 h-4" /> Volver a la biblioteca
       </Link>
 
-      <h1
-        ref={titulo}
-        tabIndex={-1}
-        className="font-display text-3xl leading-tight text-cloth sm:text-4xl"
-      >
-        {libroSeleccionado
-          ? 'Un lugar en tu biblioteca'
-          : 'Encuentra tu próxima historia'}
-      </h1>
-      <p className="mb-7 mt-3 text-sm leading-relaxed text-ink/75">
-        {libroSeleccionado
-          ? 'Guarda esta edición y lo que quieras recordar de ella.'
-          : 'Busca el libro que quieres guardar y elige tu edición.'}
-      </p>
-
+      <div className="discovery-opening">
+        <h1
+          ref={titulo}
+          tabIndex={-1}
+          className="font-display text-4xl leading-tight text-cloth sm:text-5xl"
+        >
+          {libroSeleccionado
+            ? 'Un lugar en tu biblioteca'
+            : 'Encuentra tu próxima historia'}
+        </h1>
+        <p className="mb-7 mt-3 text-sm leading-relaxed text-ink/75">
+          {libroSeleccionado
+            ? 'Guarda esta edición y lo que quieras recordar de ella.'
+            : 'Busca el libro que quieres guardar y elige tu edición.'}
+        </p>
+      </div>
       <div hidden={!!libroSeleccionado}>
         <BuscadorGoogleBooks onSeleccionar={seleccionar} />
       </div>

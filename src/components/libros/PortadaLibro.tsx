@@ -9,7 +9,7 @@ export default function PortadaLibro({ url }: { url: string | null }) {
   const [fallida, setFallida] = useState<string | null>(null)
 
   return (
-    <span className="relative flex h-24 w-16 shrink-0 items-center justify-center overflow-hidden rounded-r-sm border-l-4 border-cloth/30 bg-cloth/10 text-cloth">
+    <span className="relative flex h-24 w-16 shrink-0 items-center justify-center overflow-hidden rounded-r-sm border-l border-cloth/30 bg-cloth/10 text-cloth">
       {portada && fallida !== portada ? (
         <img
           src={portada}

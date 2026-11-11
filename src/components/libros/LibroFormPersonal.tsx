@@ -170,10 +170,10 @@ export default function LibroFormPersonal({
           <select
             id="elegir-estado"
             value={estado}
-            onChange={(e) => setEstado(e.target.value as EstadoLectura)}
+            onChange={e => setEstado(e.target.value as EstadoLectura)}
             className="editorial-input text-base"
           >
-            {ESTADOS.map((s) => (
+            {ESTADOS.map(s => (
               <option key={s} value={s}>
                 {s}
               </option>
@@ -195,7 +195,7 @@ export default function LibroFormPersonal({
           <textarea
             id="libroformpersonal-9"
             value={resumenAnalisis}
-            onChange={(e) => setResumenAnalisis(e.target.value)}
+            onChange={e => setResumenAnalisis(e.target.value)}
             maxLength={20000}
             rows={3}
             aria-describedby="nota-ayuda"
@@ -222,7 +222,7 @@ export default function LibroFormPersonal({
                 maxLength={8192}
                 placeholder="https://..."
                 value={portadaUrl}
-                onChange={(e) => setPortadaUrl(e.target.value)}
+                onChange={e => setPortadaUrl(e.target.value)}
                 className="editorial-input text-base"
               />
             </div>
@@ -243,7 +243,7 @@ export default function LibroFormPersonal({
                   step="0.1"
                   inputMode="decimal"
                   value={puntuacion}
-                  onChange={(e) => setPuntuacion(e.target.value)}
+                  onChange={e => setPuntuacion(e.target.value)}
                   className="editorial-input text-base"
                 />
               </div>
@@ -258,11 +258,11 @@ export default function LibroFormPersonal({
                 <select
                   id="libroformpersonal-4"
                   value={formato}
-                  onChange={(e) => setFormato(e.target.value as FormatoLectura)}
+                  onChange={e => setFormato(e.target.value as FormatoLectura)}
                   className="editorial-input text-base"
                 >
                   <option value="">Sin especificar</option>
-                  {FORMATOS.map((f) => (
+                  {FORMATOS.map(f => (
                     <option key={f} value={f}>
                       {f}
                     </option>
@@ -280,13 +280,13 @@ export default function LibroFormPersonal({
                 <select
                   id="libroformpersonal-5"
                   value={procedencia}
-                  onChange={(e) =>
+                  onChange={e =>
                     setProcedencia(e.target.value as ProcedenciaLibro)
                   }
                   className="editorial-input text-base"
                 >
                   <option value="">Sin especificar</option>
-                  {PROCEDENCIAS.map((p) => (
+                  {PROCEDENCIAS.map(p => (
                     <option key={p} value={p}>
                       {p}
                     </option>
@@ -308,7 +308,7 @@ export default function LibroFormPersonal({
                   min="1000"
                   max="9999"
                   value={anioLectura}
-                  onChange={(e) => setAnioLectura(e.target.value)}
+                  onChange={e => setAnioLectura(e.target.value)}
                   className="editorial-input text-base"
                 />
               </div>
@@ -324,7 +324,7 @@ export default function LibroFormPersonal({
                 <select
                   id="libroformpersonal-7"
                   value={mesLectura}
-                  onChange={(e) => setMesLectura(e.target.value)}
+                  onChange={e => setMesLectura(e.target.value)}
                   disabled={!anioLectura}
                   className="editorial-input text-base disabled:bg-cloth/5 disabled:text-ink/60"
                 >
@@ -357,7 +357,7 @@ export default function LibroFormPersonal({
                 type="text"
                 maxLength={500}
                 value={personajeFavorito}
-                onChange={(e) => setPersonajeFavorito(e.target.value)}
+                onChange={e => setPersonajeFavorito(e.target.value)}
                 className="editorial-input text-base"
               />
             </div>
@@ -373,7 +373,7 @@ export default function LibroFormPersonal({
                 id="libroformpersonal-10"
                 maxLength={20000}
                 value={citasDestacadas}
-                onChange={(e) => setCitasDestacadas(e.target.value)}
+                onChange={e => setCitasDestacadas(e.target.value)}
                 rows={3}
                 className="editorial-input text-base"
               />
@@ -408,7 +408,7 @@ export default function LibroFormPersonal({
           type="button"
           disabled={guardando}
           onClick={onCancelar}
-          className="min-h-12 rounded-xl border border-cloth/50 px-4 py-3 text-sm font-medium text-cloth disabled:opacity-70"
+          className="min-h-12 rounded-md border border-cloth/50 px-4 py-3 text-sm font-medium text-cloth disabled:opacity-70"
         >
           Cancelar
         </button>

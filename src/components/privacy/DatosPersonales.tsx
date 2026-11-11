@@ -53,10 +53,7 @@ export default function DatosPersonales({
       <h1 className="font-display text-3xl text-cloth sm:text-4xl">
         Tus datos, a mano
       </h1>
-      <section
-        className="mt-7 border-y border-rule py-6"
-        aria-labelledby="descarga-titulo"
-      >
+      <section className="journal-sheet mt-7" aria-labelledby="descarga-titulo">
         <h2 id="descarga-titulo" className="font-display text-2xl text-cloth">
           Una copia de tu biblioteca
         </h2>
