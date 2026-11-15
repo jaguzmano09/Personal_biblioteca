@@ -93,6 +93,14 @@ export default function DatosPersonales({
           </p>
         )}
       </section>
+      <p className="py-5 text-sm">
+        <Link
+          href="/ayuda"
+          className="editorial-link inline-flex min-h-12 items-center"
+        >
+          Ayuda, privacidad y solicitudes de cuenta
+        </Link>
+      </p>
       {contacto && (
         <section className="py-6" aria-labelledby="solicitudes-titulo">
           <h2

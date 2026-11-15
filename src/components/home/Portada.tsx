@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowDown, BookOpen, Feather, Bookmark } from 'lucide-react'
 import Wordmark from '@/components/ui/Wordmark'
 import JournalDemo from './JournalDemo'
+import LegalLinks from '@/components/privacy/LegalLinks'
 
 export default function Portada() {
   return (
@@ -187,8 +188,8 @@ export default function Portada() {
                 <summary>¿Quién puede ver mis notas?</summary>
                 <p>
                   Tu biblioteca y tus anotaciones se consultan desde tu cuenta.
-                  Cada persona tiene su propio espacio. No hay perfiles
-                  públicos ni un muro donde se publiquen tus notas.
+                  Cada persona tiene su propio espacio. No hay perfiles públicos
+                  ni un muro donde se publiquen tus notas.
                 </p>
               </details>
               <details className="faq-row">
@@ -211,6 +212,7 @@ export default function Portada() {
         </section>
       </main>
       <footer className="site-width flex flex-wrap items-center justify-between gap-5 border-t border-rule py-8">
+        <LegalLinks />
         <Wordmark href="/" />
         <p className="text-sm text-ink/75">
           Un lugar para lo que queda entre páginas.

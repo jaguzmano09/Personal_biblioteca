@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import Wordmark from '@/components/ui/Wordmark'
+import LegalLinks from '@/components/privacy/LegalLinks'
 
 export default function AuthShell({ children }: { children: React.ReactNode }) {
   return (
@@ -27,7 +28,12 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
             <ArrowLeft aria-hidden="true" className="size-4" /> Volver al inicio
           </Link>
         </header>
-        <div className="auth-form-body">{children}</div>
+        <div className="auth-form-body">
+          {children}
+          <footer className="mt-8">
+            <LegalLinks />
+          </footer>
+        </div>
       </div>
     </main>
   )

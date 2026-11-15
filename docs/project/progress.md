@@ -23,6 +23,13 @@ The owner published the dashboard commits. On November 14, a read-only Vercel ch
 
 ## Change record
 
+### November 14, 2026 — Public notices and private operator configuration
+
+- Added Spanish `/privacidad`, `/terminos` and `/ayuda` pages and links from the welcome, access shell and protected data page, addressing ISSUE-001's missing information and ISSUE-007's missing contact path. Dynamic server rendering loads contact values from private settings; no personal values are embedded in versioned source or client bundles.
+- Upserted the five encrypted production operator settings in Vercel. They require a subsequent application deployment to take effect. Added the `server-only` import boundary; missing settings show unavailable guidance.
+- Applied shadcn, frontend-design, responsive-design and Impeccable guidance while preserving the existing identity. Browser/axe checks passed at 320/390/768/1440 px using fictional operator details. The mechanical scan returned zero findings; repository/client exposure checks found no configured private values. The dependency audit reported zero vulnerabilities.
+- Commit: `feat(privacy): add public notices and support access`. Local on `main`; runtime settings are saved, while application publication and operational/legal review remain pending.
+
 ### November 14, 2026 — Persistent goal-save feedback
 
 - Resolved ISSUE-006 by keeping the goal acknowledgement when server revalidation supplies updated goal props. Switching years or reopening the editor clears the old acknowledgement.
