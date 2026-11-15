@@ -59,12 +59,16 @@ The function returns success after Brevo accepts every required email for the op
 - Spanish templates cover registration, invitations, recovery, magic links, email changes and reauthentication. Unsupported actions are rejected.
 - Secure email changes send to both addresses using Supabase's hash mapping for each recipient.
 - Confirmation links use the Auth verifier and a fixed trusted callback. The function validates the destination independently of the incoming payload.
-- Recovery and email-change templates exist. Their corresponding web screens still require implementation and verification before those flows can be offered.
+- Recovery uses `/recuperar` and `/actualizar-clave`; confirmation renewal uses `/confirmar`. Email-change templates exist, but there is no self-service email-change screen.
 - Delivery has no internal retry loop. An external retry after an uncertain response can duplicate an email. An operation requiring two emails can partially complete.
 - The Brevo request budget is 3.5 seconds to fit the Auth hook timeout.
 - Provider configuration and real delivery require separate operational verification after deployment.
 
 ## Rollback
+
+The November 14 recovery increment preserves the trusted callback and adds only `flow=recovery` for a verified recovery action. The app exchanges the PKCE code and selects `/actualizar-clave` using that fixed enum; signup/confirmation still reaches `/biblioteca`. Invalid codes show recovery/confirmation guidance. Arbitrary `next` destinations are ignored. Request and open the link in the same browser so the PKCE verifier is available. Keep the base callback and its exact `?flow=recovery` variant in the production redirect allowlist; do not introduce wildcard hosts.
+
+The recovery hook revision was deployed as `send-auth-email` version 13 on November 14. Its existing signed-webhook authentication and private secrets remain unchanged. Application routes still need publication with the corresponding commits. Tests cover link construction and signed handler behavior; a local production build with an isolated real account verified password update, sign-out and subsequent sign-in. Actual recovery/confirmation inbox delivery and link consumption remain separate release checks. Public request feedback is conditional and does not disclose account existence; a 60-second UI cooldown complements provider rate limits.
 
 Disable the Send Email hook. With custom SMTP disabled, Supabase uses its default delivery service, whose recipient and quota limits apply. Keep email confirmation enabled. Revoke the dedicated Brevo key when retiring the integration.
 

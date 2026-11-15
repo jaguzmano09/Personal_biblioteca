@@ -23,6 +23,14 @@ The owner published the dashboard commits. On November 14, a read-only Vercel ch
 
 ## Change record
 
+### November 14, 2026 — Recovery and confirmation renewal
+
+- Addressed ISSUE-003 and ISSUE-004 with visible login/registration entries, `/recuperar`, `/confirmar` and `/actualizar-clave`. Conditional email feedback, a 60-second UI cooldown, expired-link guidance and fixed callback routing preserve account privacy. Arbitrary return destinations are ignored.
+- The email hook adds the trusted recovery-flow enum only to actual recovery emails. Published `send-auth-email` version 13, preserving its existing signature authentication and secret configuration. The web changes remain local until application publication; production redirect-allowlist and actual delivery/link consumption still need release verification.
+- The local production build with an isolated real Supabase account passed password update, session closure and sign-in with the new password. That journey exposed and fixed a success-state issue caused by session revalidation after sign-out. This is authenticated password-change evidence, not evidence of an inbox recovery link.
+- Verification passed all 41 tests, build/TypeScript and anonymous smoke checks. Browser tests covered recovery/resend request feedback/cooldowns, expired reset access and mobile layouts without axe findings. Existing accounts were untouched and all temporary data was removed.
+- Commit: `feat(auth): add recovery and confirmation renewal`. Application changes local on `main`; the backward-compatible mail hook update is active.
+
 ### November 14, 2026 — Guided registration and access-action safeguards
 
 - Resolved ISSUE-002's missing age guidance and completed ISSUE-001's separate unchecked terms/data controls using the reviewed official shadcn Checkbox. Adults can self-register only with complete operator settings and a matching notice version; ages 15–17 receive the assisted route and under-15 registration is unavailable. Credentials are not requested in those youth paths.

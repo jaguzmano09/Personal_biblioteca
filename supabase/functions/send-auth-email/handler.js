@@ -26,6 +26,7 @@ export function buildMessages(payload, config) {
   // Never use a payload-provided origin or redirect destination in authentication links.
   const origin = new URL(config.supabaseUrl)
   const callback = new URL(config.callbackUrl)
+  if (type === 'recovery') callback.searchParams.set('flow', 'recovery')
   if (origin.protocol !== 'https:' || callback.protocol !== 'https:') throw new Error('HTTPS required')
   const recipients = type === 'email_change'
     ? [

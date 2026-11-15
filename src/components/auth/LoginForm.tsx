@@ -44,6 +44,16 @@ export default function LoginForm({
       <p className="mb-8 mt-5 text-base leading-relaxed text-ink/75">
         Entra a tu biblioteca y retoma el hilo de tus lecturas.
       </p>
+      {confirmationError && (
+        <p className="mb-5 text-sm">
+          <Link
+            href="/confirmar"
+            className="editorial-link inline-flex min-h-12 items-center"
+          >
+            Pedir otra confirmación
+          </Link>
+        </p>
+      )}
       <form
         onSubmit={handleSubmit}
         className="space-y-5"
@@ -97,6 +107,12 @@ export default function LoginForm({
           </button>
         </fieldset>
       </form>
+      <Link
+        href="/recuperar"
+        className="editorial-link mt-4 inline-flex min-h-12 items-center text-sm"
+      >
+        Olvidé mi contraseña
+      </Link>
       <p className="mt-7 text-center text-sm text-ink/80">
         ¿Tu primera página aquí?{' '}
         <Link

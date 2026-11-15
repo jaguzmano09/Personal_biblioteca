@@ -47,6 +47,11 @@ try {
   const callback = await fetch(`${origin}/api/auth/callback`, { redirect: 'manual' })
   assert.equal(callback.status, 307)
   assert.equal(callback.headers.get('location'), `${origin}/login?error=confirmation`)
+  const recoveryCallback = await fetch(`${origin}/api/auth/callback?flow=recovery&next=https://attacker.example`, { redirect: 'manual' })
+  assert.equal(recoveryCallback.headers.get('location'), `${origin}/recuperar?error=expired`)
+  for (const path of ['/recuperar', '/confirmar', '/actualizar-clave', '/privacidad', '/terminos', '/ayuda']) {
+    assert.equal((await fetch(origin + path)).status, 200, path)
+  }
   const login = await fetch(`${origin}/login?error=confirmation`)
   assert.equal(login.status, 200)
   assert.equal(login.headers.get('x-frame-options'), 'DENY')

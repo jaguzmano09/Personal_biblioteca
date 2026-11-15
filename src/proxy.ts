@@ -6,27 +6,26 @@ export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request })
   const { url, key } = supabaseConfig()
 
-  const supabase = createServerClient(
-    url, key,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
-          response = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
-        },
+  const supabase = createServerClient(url, key, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll()
       },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value)
+        )
+        response = NextResponse.next({ request })
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        )
+      }
     }
-  )
+  })
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user }
+  } = await supabase.auth.getUser()
 
   const isProtectedRoute = request.nextUrl.pathname.startsWith('/biblioteca')
   const isAuthRoute = ['/login', '/registro'].includes(request.nextUrl.pathname)
@@ -38,16 +37,29 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!user && isProtectedRoute) {
-    return privateResponse(NextResponse.redirect(new URL('/login', request.url)))
+    return privateResponse(
+      NextResponse.redirect(new URL('/login', request.url))
+    )
   }
 
   if (user && isAuthRoute) {
-    return privateResponse(NextResponse.redirect(new URL('/biblioteca', request.url)))
+    return privateResponse(
+      NextResponse.redirect(new URL('/biblioteca', request.url))
+    )
   }
 
   return privateResponse(response)
 }
 
 export const config = {
-  matcher: ['/', '/login', '/registro', '/biblioteca/:path*', '/api/:path*'],
+  matcher: [
+    '/',
+    '/login',
+    '/registro',
+    '/recuperar',
+    '/confirmar',
+    '/actualizar-clave',
+    '/biblioteca/:path*',
+    '/api/:path*'
+  ]
 }
