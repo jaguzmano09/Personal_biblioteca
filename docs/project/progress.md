@@ -23,6 +23,14 @@ The owner published the dashboard commits. On November 14, a read-only Vercel ch
 
 ## Change record
 
+### November 14, 2026 — Guided registration and access-action safeguards
+
+- Resolved ISSUE-002's missing age guidance and completed ISSUE-001's separate unchecked terms/data controls using the reviewed official shadcn Checkbox. Adults can self-register only with complete operator settings and a matching notice version; ages 15–17 receive the assisted route and under-15 registration is unavailable. Credentials are not requested in those youth paths.
+- Server validation repeats the eligibility/acceptance checks and writes a versioned receipt to user metadata. That editable metadata is not an immutable authorization record or proof of age. Automated guardian verification and provider-level signup enforcement remain launch work.
+- Added server-side recovery/resend/password-update actions for the following access increment. They use fixed destinations, conditional non-enumerating email feedback and a verified session before password mutation.
+- Verification: 41 tests passed, including missing consent, youth self-registration, absent operator settings, trusted email destinations and password/session checks. Actual-component browser checks verified the three age paths, two independent controls, disabled submission and confirmation at four widths, with no axe findings. The final mobile consent labels were visually checked after fixing inline wrapping.
+- Commit: `feat(auth): guide registration and validate access requests`. Local on `main`; application publication and assisted-process review remain pending.
+
 ### November 14, 2026 — Public notices and private operator configuration
 
 - Added Spanish `/privacidad`, `/terminos` and `/ayuda` pages and links from the welcome, access shell and protected data page, addressing ISSUE-001's missing information and ISSUE-007's missing contact path. Dynamic server rendering loads contact values from private settings; no personal values are embedded in versioned source or client bundles.
