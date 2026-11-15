@@ -9,19 +9,30 @@ Tinteruna is a private reading journal with a Spanish interface, editorial typog
 | Area | Implemented | Verification and remaining work |
 | --- | --- | --- |
 | Public welcome and identity | Illustrated story, interactive temporary journal preview, shared literary typography and magical-realism artwork | Anonymous production pages and isolated components reviewed at four widths; zero axe findings in checked views. Physical-device review remains open. |
-| Access | Registration, confirmation, sign-in and sign-out | Anonymous boundaries checked locally. Real authenticated recovery and complete account lifecycle remain open. |
-| Library | A prominent reading dashboard before the catalog, current-reading continuation, mobile navigation, filters, sorting, annual goals, reading-state detail and inline notes | Regression checks cover data validation and PostgreSQL isolation. Dashboard browser checks cover six widths, goal recovery, asynchronous year changes and empty/long-content states. Real authenticated persistence and physical-device review remain open. |
-| Discovery and addition | Explicit Google Books search, edition comparison, optional personal note, recoverable save errors and bookmark confirmation | Isolated browser checks cover 360, 390, 768 and 1366 px, short viewports and keyboard focus. Real provider/save persistence remains open. |
-| Privacy controls | Private JSON export and a protected data/contact page | Tests cover ownership filters, pagination, anonymous denial and safe failure. Real authenticated export remains open. |
+| Access | Registration, confirmation, sign-in and sign-out | Live sign-in/sign-out and protected-library denial passed with an isolated account. Public signup/email delivery, recovery and complete account lifecycle remain open. |
+| Library | A prominent reading dashboard before the catalog, current-reading continuation, mobile navigation, filters, sorting, annual goals, reading-state detail and inline notes | Live goal/book/note persistence, completion, filters and confirmed deletion passed. Missing reading-year guidance and goal-save feedback are open findings. Physical-device review remains open. |
+| Discovery and addition | Explicit Google Books search, edition comparison, optional personal note, recoverable save errors and bookmark confirmation | Live Google Books edition search and addition passed. No-result discovery lacks a manual-book fallback. Earlier isolated checks covered save recovery and keyboard focus. |
+| Privacy controls | Private JSON export and a protected data/contact page | Live downloaded JSON matched the isolated account and its test records. Public notices and a usable deployed privacy/support contact remain open findings. |
 | Launch preparation | Data-flow inventory, readiness assessment and internal legal drafts | Approved notices, adolescent safeguards, retention, recovery/closure operations and provider evidence remain open. |
 | Repository | English documentation grouped by purpose, shared agent instructions and ignored local tool state | Local links, repository exposure checks and documentation consistency reviewed with this increment. |
 | Production origin | Tinteruna is canonical; the legacy production hostname redirects with HTTP 308 | Published in Vercel project-level routing. Passed 22 live HTTP assertions, including paths, queries, anonymous access boundaries and no loops. Authenticated migration remains untested. |
 
 ## Publication status
 
-On November 14, a read-only Vercel check confirmed the production deployment as READY from `main` commit `dbd3b67`, including the identity increment below. Both production domains resolved to that deployment. The canonical-origin routing rule was then published separately in Vercel, without rebuilding, redeploying or pushing application code. The hosting documentation commit `1d3b362` and subsequent dashboard work remain local until explicitly published. Complete authenticated acceptance and private provider-setting checks still require separate evidence.
+The owner published the dashboard commits. On November 14, a read-only Vercel check confirmed the production deployment as READY from `main` commit `b0894f7`, and the first-reader review exercised that live version. The previously published canonical-origin routing rule remains independent of application releases. This review's report and progress updates are local documentation until explicitly published; the findings have not been implemented. Email delivery, recovery, physical-device and remaining launch checks still need evidence.
 
 ## Change record
+
+### November 14, 2026 — Live first-reader walkthrough
+
+- Completed an unfamiliar-reader walkthrough against the published platform, using the agent-browser exploratory-testing skill and an independently driven Chrome check for download/layout evidence. The [production review](../qa/first-reader-review-2026-11-14.md) records eight open findings: five high and three medium, with reproduction steps, expected improvements and local screenshot references.
+- The owner authorized arranging test access. Existing accounts were not marked as test accounts and no reusable credentials were available, so a dedicated confirmed QA account was administratively provisioned. Existing users, passwords and personal records were not modified. Normal browser login was used; administrative provisioning does not verify public signup or email delivery.
+- Live passes included Google Books search/selection, creation with a note, note editing and full reload, completed state and decimal score, goal persistence, filters/reset, JSON download, canceled/confirmed deletion, sign-out and signed-out library denial. The export matched only the isolated account and its one book/goal.
+- Confirmed a core motivation gap: marking a book read without a reading year leaves annual progress unchanged without warning. Supplying the year restored the correct completed-book count, pages, score and goal progress. The arithmetic itself passed.
+- Also recorded missing pre-registration notices/age guidance, password recovery, confirmation-resend guidance, deployed support/privacy contact, stable goal-save acknowledgement and manual-add coverage after no provider results.
+- Four live authenticated views at 320/390/768/1440 px had no horizontal overflow or axe findings, and captured page exceptions were empty. Real phones, screen readers, email delivery and exhaustive cross-account/concurrency checks were outside this review. A canceled agent-browser download was contrasted with a successful independent browser download and excluded as a tool issue. Video was unavailable because ffmpeg was absent.
+- Deleted the test book through the UI and removed the marked temporary account. Follow-up checks confirmed zero remaining QA accounts, books, goals or sessions, with the original account total restored. Removed temporary credentials/session/export files, deleted the dedicated credential profile and closed review browsers. Evidence is kept in the ignored `.local-reviews/` directory; the versioned report contains no real private values.
+- This increment records findings and acceptance evidence; it does not change application behavior, provider settings, schema or deployments. Commit messages: `docs(qa): record the live first-reader review` and `docs(project): record authenticated acceptance results`.
 
 ### November 14, 2026 — Reading progress before the catalog
 
@@ -81,7 +92,7 @@ Verification passed 36 tests, TypeScript, the production build, anonymous smoke 
 
 ## Next work
 
-1. Verify authenticated search/add, inline notes and export using isolated authorized accounts, followed by phone keyboard and device checks.
+1. Resolve the [first-reader findings](../qa/first-reader-review-2026-11-14.md), starting with the finish-book/year-to-goal journey and access recovery. Follow with physical-phone keyboard and device checks.
 2. Complete recovery, account correction, closure and withdrawal procedures with proportionate identity verification and retention/backup decisions.
 3. Implement and review the adolescent registration safeguards for the intended Colombia audience.
 4. Finalize Spanish legal notices and terms, consent/acceptance controls where applicable, and pre-registration links after the operational facts are confirmed.
