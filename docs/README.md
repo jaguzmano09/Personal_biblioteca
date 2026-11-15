@@ -9,6 +9,7 @@ Read [platform progress](project/progress.md) for the current implementation sta
 | Operations | [Deployment](operations/deployment.md) | Database rollout, staging acceptance and private operator configuration |
 | Operations | [Authentication email](operations/auth-email.md) | Signed Supabase Auth hook and Brevo delivery procedures |
 | Design | [Frontend skills](design/frontend-skills.md) | Reviewed skill sources, revisions and design decisions |
+| Quality | [First-reader production review](qa/first-reader-review-2026-11-14.md) | Reproduced user-facing issues, authenticated acceptance evidence and correction priorities |
 | Security | [Privacy readiness](security/privacy-readiness.md) | Data flows, launch findings, verification and repository exposure review |
 | Legal | [Internal legal drafts](legal/drafts.md) | Draft policy, terms and storage information for review |
 

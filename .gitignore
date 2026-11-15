@@ -37,3 +37,6 @@ next-env.d.ts
 
 # Supabase CLI local state
 /supabase/.temp/
+
+# Private browser-review evidence and local session artifacts
+/.local-reviews/
