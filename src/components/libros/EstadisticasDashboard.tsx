@@ -51,7 +51,6 @@ export default function EstadisticasDashboard({
     setCargandoMeta(true)
     setErrorCarga(false)
     setError(null)
-    setGuardada(false)
     setEditandoMeta(false)
     obtenerMeta(anioSeleccionado)
       .then(value => {
@@ -139,7 +138,10 @@ export default function EstadisticasDashboard({
             id="statistics-year"
             disabled={isPending}
             value={anioSeleccionado}
-            onChange={event => setAnioSeleccionado(Number(event.target.value))}
+            onChange={event => {
+              setGuardada(false)
+              setAnioSeleccionado(Number(event.target.value))
+            }}
           >
             {aniosDisponibles.map(anio => (
               <NativeSelectOption key={anio} value={anio}>

@@ -23,6 +23,12 @@ The owner published the dashboard commits. On November 14, a read-only Vercel ch
 
 ## Change record
 
+### November 14, 2026 — Persistent goal-save feedback
+
+- Resolved ISSUE-006 by keeping the goal acknowledgement when server revalidation supplies updated goal props. Switching years or reopening the editor clears the old acknowledgement.
+- Verification: the complete regression suite and build passed. The isolated real-account browser journey saved a goal, observed the acknowledgement after the server refresh and confirmed persisted reading progress after a full reload. No fixture-only persistence claim is used for this check.
+- Commit: `fix(dashboard): preserve the goal save acknowledgement`. Local on `main`; application publication remains pending.
+
 ### November 14, 2026 — Manual books and dated completion
 
 - Resolved ISSUE-005's completion guidance and ISSUE-008's catalog fallback. Marking an undated book completed suggests the current browser year and explains its annual-goal effect. Explicit historical years remain intact; deliberately clearing the year remains possible with a warning. Pending/abandoned books still do not advance goals.
