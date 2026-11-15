@@ -4,6 +4,8 @@ Assessment of repository baseline `ae7a23f`, dated 2026-11-10. Priority **Blocke
 
 November 14 follow-up: public Spanish notices, separate registration controls, assisted age guidance, recovery/resend screens and private operator runtime settings are now implemented. See the [finding resolution matrix](../qa/first-reader-review-2026-11-14.md#implementation-follow-up) and [current progress](../project/progress.md) for evidence/publication status. The original checklist below remains the baseline assessment. Its broader legal, adolescent-verification, retention, provider and security findings are not closed by these UX corrections. Acceptance metadata is user-editable; actual email-link acceptance and production activation remain unverified.
 
+The later [sixteen-control security assessment](hardening-roadmap.md) refreshes live database/advisor/firewall/HTTP evidence and defines prioritized implementation. It confirms owner-only forced RLS but adds review of privileged helper execution, explicit cookie hardening, provider-enforced CAPTCHA, shared authentication limits and verified backup/restore operations. No provider security setting was changed by that assessment.
+
 The operator confirmed their identity and contact details, Colombia as the initial market, and an intended audience older than 14. Actual operator details belong in server-only environment settings and are excluded from versioned documentation. The [internal English legal drafts](../legal/drafts.md) use field references and identify the approved user-facing documents as future Spanish copy. Retention, processor arrangements and the adolescent authorization workflow still need completion.
 
 ## Data and recipients

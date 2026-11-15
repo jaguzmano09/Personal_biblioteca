@@ -23,6 +23,14 @@ The owner previously published the dashboard commits. The last verified web prod
 
 ## Change record
 
+### November 14, 2026 — Sixteen-control security assessment and roadmap
+
+- Checked the owner's sixteen security requirements against source, live Supabase schema/policies/grants/functions/advisors, Vercel's active firewall and anonymous production HTTP responses. Recorded the [assessment and ordered roadmap](../security/hardening-roadmap.md), separating implemented controls, missing application integration and unverified provider operations.
+- Confirmed forced owner-only RLS on books/goals, no anonymous application-table grants, no app-role schema creation/private-schema access, no public views/Storage buckets and no app admin/debug route found. Checked live app responses have no cross-origin allow headers and preserve existing security headers/anonymous denial. The CSP remains partial. Default SSR cookies lack an explicit hardened application policy; CAPTCHA and a shared login limiter are absent from source. Vercel has no custom firewall configuration; provider Auth limits and actual backup history remain unverified.
+- Re-read security advisories: mutable timestamp-trigger search path, excessive client EXECUTE on a privileged event-trigger helper, intentional guarded quota RPCs, deliberately policy-free private quota tables and disabled leaked-password protection. The event-trigger helper's RPC exploitability was not demonstrated; the roadmap requires staged permission review rather than claiming an admin takeover.
+- Verification: all 41 tests passed; the npm audit returned zero known vulnerabilities after retrying a sandbox network failure. Final exposure checks covered 115 versionable files/49 built client files with no configured private values or secret signatures found; documentation checks passed 42 local links across 13 Markdown files. No existing accounts/content/hashes were read, no application/provider/database behavior was changed and no brute-force/load test was run. Only documentation is changed in this increment; no application rebuild is needed.
+- Commit: `docs(security): assess sixteen controls and prioritize hardening`. Local on `main`, not pushed. Implementation starts with session hardening, a recoverable backup gate before database changes, privileged-function review and coordinated bot/attempt protection; full CSP/live acceptance follows.
+
 ### November 14, 2026 — Remediation evidence and release handoff
 
 - Updated the [original review](../qa/first-reader-review-2026-11-14.md#implementation-follow-up) with a correction/evidence matrix for all eight findings, preserving the original production observations. Updated setup, operations, legal-draft status, design provenance and the privacy baseline follow-up.
@@ -136,6 +144,7 @@ Verification passed 36 tests, TypeScript, the production build, anonymous smoke 
 ## Next work
 
 1. Publish the local application commits when instructed, verify the public operator contact and exact recovery callback allowlist, and exercise real confirmation/resend/recovery emails and expired links. See the [finding resolution matrix](../qa/first-reader-review-2026-11-14.md#implementation-follow-up).
+   Before expanding registration, execute the P0 controls in the [security roadmap](../security/hardening-roadmap.md): hardened cookies, recoverable backups, helper permissions and provider-enforced CAPTCHA/shared attempt limits.
 2. Complete operational/legal review of the published notices, rights/closure/withdrawal handling and retention/backup decisions.
 3. Review proportionate guardian verification, the adolescent's participation, durable authorization evidence and provider-level signup enforcement before opening assisted enrollment.
 4. Address the separate recorded security/provider findings, then reassess public-launch readiness.

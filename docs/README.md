@@ -11,6 +11,7 @@ Read [platform progress](project/progress.md) for the current implementation sta
 | Design | [Frontend skills](design/frontend-skills.md) | Reviewed skill sources, revisions and design decisions |
 | Quality | [First-reader production review](qa/first-reader-review-2026-11-14.md) | Reproduced user-facing issues, authenticated acceptance evidence and correction priorities |
 | Security | [Privacy readiness](security/privacy-readiness.md) | Data flows, launch findings, verification and repository exposure review |
+| Security | [Security hardening roadmap](security/hardening-roadmap.md) | Sixteen-control verification, live evidence, ordered implementation and release acceptance |
 | Legal | [Internal legal drafts](legal/drafts.md) | Draft policy, terms and storage information for review |
 
 `README.md` introduces the application and development commands. `AGENTS.md` holds the shared agent instructions at the repository root, and `CLAUDE.md` imports them. Next.js manages the marked framework block in `AGENTS.md`.
