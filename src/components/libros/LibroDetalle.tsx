@@ -364,7 +364,12 @@ export default function LibroDetalle({ libro }: { libro: Libro }) {
                     id="librodetallemodal-2"
                     autoFocus={focoEdicion === 'estado'}
                     value={estado}
-                    onChange={e => setEstado(e.target.value as EstadoLectura)}
+                    onChange={e => {
+                      const siguiente = e.target.value as EstadoLectura
+                      setEstado(siguiente)
+                      if (siguiente === 'Leído' && !anioLectura)
+                        setAnioLectura(String(new Date().getFullYear()))
+                    }}
                     className="editorial-input"
                   >
                     {ESTADOS.map(s => (
@@ -453,6 +458,13 @@ export default function LibroDetalle({ libro }: { libro: Libro }) {
                     onChange={e => setAnioLectura(e.target.value)}
                     className="editorial-input"
                   />
+                  {estado === 'Leído' && (
+                    <p className="mt-2 text-sm text-ink/75">
+                      {anioLectura
+                        ? `Esta lectura contará en tu progreso de ${anioLectura}. Revísalo si la terminaste en otro año.`
+                        : 'Sin año, esta lectura se guardará, pero no contará en ninguna meta anual.'}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label

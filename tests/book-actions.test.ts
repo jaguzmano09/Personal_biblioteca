@@ -28,7 +28,7 @@ const hooks = registerHooks({
     return nextResolve(specifier, context)
   }
 })
-const { guardarLibro } = (await import(
+const { guardarLibro, guardarLibroManual } = (await import(
   actionUrl
 )) as typeof import('../src/lib/libros.ts')
 hooks.deregister()
@@ -129,4 +129,29 @@ test('successful creation preserves decimal scores, notes and varied cover sourc
   assert.equal(payload.resumen_analisis, 'Mi primera impresión')
   assert.equal(payload.portada_url, edition.portada_url)
   assert.deepEqual(action.invalidated, ['/biblioteca'])
+})
+
+test('manual creation validates metadata and never accepts a supplied owner or provider id', async () => {
+  const action = setup()
+  const result = await guardarLibroManual(
+    { ...edition, user_id: 'attacker' },
+    {
+      estado: 'Leído',
+      anio_lectura: 2026,
+      puntuacion: 7.6,
+      user_id: 'attacker'
+    }
+  )
+  assert.equal(result.ok, true)
+  const payload = action.inserted[0] as Record<string, unknown>
+  assert.equal(payload.google_books_id, null)
+  assert.equal(payload.user_id, 'owner-a')
+  assert.equal(payload.anio_lectura, 2026)
+  const invalid = await guardarLibroManual(
+    { ...edition, titulo: ' ' },
+    { estado: 'Pendiente' }
+  )
+  assert.equal(invalid.ok, false)
+  setup(null, false)
+  await assert.rejects(guardarLibroManual({}, {}), /Authentication required/)
 })

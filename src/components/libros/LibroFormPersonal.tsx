@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { BookmarkCheck, Loader2 } from 'lucide-react'
 import PortadaLibro from './PortadaLibro'
-import { guardarLibro } from '@/lib/libros'
+import { guardarLibro, guardarLibroManual } from '@/lib/libros'
 import type {
-  GoogleBookResult,
+  BookMetadata,
   EstadoLectura,
   FormatoLectura,
   ProcedenciaLibro
@@ -21,7 +21,7 @@ const PROCEDENCIAS: ProcedenciaLibro[] = [
 ]
 
 interface Props {
-  libroSeleccionado: GoogleBookResult
+  libroSeleccionado: BookMetadata
   onCancelar: () => void
 }
 
@@ -60,20 +60,25 @@ export default function LibroFormPersonal({
     setError(null)
 
     try {
-      const resultado = await guardarLibro(
-        { ...libroSeleccionado, portada_url: portadaUrl || null },
-        {
-          estado,
-          puntuacion: puntuacion ? Number(puntuacion) : null,
-          personaje_favorito: personajeFavorito || null,
-          resumen_analisis: resumenAnalisis || null,
-          citas_destacadas: citasDestacadas || null,
-          anio_lectura: anioLectura ? Number(anioLectura) : null,
-          mes_lectura: anioLectura && mesLectura ? Number(mesLectura) : null,
-          formato: formato || null,
-          procedencia: procedencia || null
-        }
-      )
+      const datosPersonales = {
+        estado,
+        puntuacion: puntuacion ? Number(puntuacion) : null,
+        personaje_favorito: personajeFavorito || null,
+        resumen_analisis: resumenAnalisis || null,
+        citas_destacadas: citasDestacadas || null,
+        anio_lectura: anioLectura ? Number(anioLectura) : null,
+        mes_lectura: anioLectura && mesLectura ? Number(mesLectura) : null,
+        formato: formato || null,
+        procedencia: procedencia || null
+      }
+      const metadata = { ...libroSeleccionado, portada_url: portadaUrl || null }
+      const resultado =
+        metadata.google_books_id === null
+          ? await guardarLibroManual(metadata, datosPersonales)
+          : await guardarLibro(
+              { ...metadata, google_books_id: metadata.google_books_id },
+              datosPersonales
+            )
       if (!resultado.ok) {
         setError(resultado.error)
         return
@@ -170,7 +175,12 @@ export default function LibroFormPersonal({
           <select
             id="elegir-estado"
             value={estado}
-            onChange={e => setEstado(e.target.value as EstadoLectura)}
+            onChange={e => {
+              const siguiente = e.target.value as EstadoLectura
+              setEstado(siguiente)
+              if (siguiente === 'Leído' && !anioLectura)
+                setAnioLectura(String(new Date().getFullYear()))
+            }}
             className="editorial-input text-base"
           >
             {ESTADOS.map(s => (
@@ -203,7 +213,17 @@ export default function LibroFormPersonal({
           />
         </div>
 
-        <details className="border-y border-rule py-2">
+        {estado === 'Leído' && (
+          <p className="text-sm leading-relaxed text-ink/75">
+            {anioLectura
+              ? `Contará en tu progreso de ${anioLectura}. Revisa el año en los detalles si la terminaste antes.`
+              : 'Sin año, el libro se guardará, pero no contará en ninguna meta anual.'}
+          </p>
+        )}
+        <details
+          open={estado === 'Leído' ? true : undefined}
+          className="border-y border-rule py-2"
+        >
           <summary className="min-h-12 cursor-pointer py-3 font-medium text-cloth">
             Portada y detalles de lectura (opcionales)
           </summary>

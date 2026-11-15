@@ -23,6 +23,13 @@ The owner published the dashboard commits. On November 14, a read-only Vercel ch
 
 ## Change record
 
+### November 14, 2026 — Manual books and dated completion
+
+- Resolved ISSUE-005's completion guidance and ISSUE-008's catalog fallback. Marking an undated book completed suggests the current browser year and explains its annual-goal effect. Explicit historical years remain intact; deliberately clearing the year remains possible with a warning. Pending/abandoned books still do not advance goals.
+- Added manual title/author/pages/ISBN entry alongside discovery and reused the existing personal-reading/note/save journey. The server validates metadata, forces a null provider ID and derives ownership from the verified session. The existing schema supports this without a migration.
+- Verification: the 41-test suite, production build and TypeScript passed. Actual-component browser checks covered manual creation, historical/undated choices and four widths. A local production build using an isolated real Supabase account verified manual creation, completion, decimal score, reload, annual progress and owner JSON export. The account and all its books/goals/sessions were removed; the two original accounts were unchanged.
+- Commit: `feat(books): support manual additions and dated completion`. Local on `main`; application publication remains pending.
+
 ### November 14, 2026 — Live first-reader walkthrough
 
 - Completed an unfamiliar-reader walkthrough against the published platform, using the agent-browser exploratory-testing skill and an independently driven Chrome check for download/layout evidence. The [production review](../qa/first-reader-review-2026-11-14.md) records eight open findings: five high and three medium, with reproduction steps, expected improvements and local screenshot references.

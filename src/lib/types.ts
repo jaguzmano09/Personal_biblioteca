@@ -37,3 +37,7 @@ export interface GoogleBookResult {
   portada_url: string | null
   isbn: string | null
 }
+
+export type BookMetadata = Omit<GoogleBookResult, 'google_books_id'> & {
+  google_books_id: string | null
+}

@@ -5,21 +5,25 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import BuscadorGoogleBooks from '@/components/libros/BuscadorGoogleBooks'
 import LibroFormPersonal from '@/components/libros/LibroFormPersonal'
-import type { GoogleBookResult } from '@/lib/types'
+import type { BookMetadata } from '@/lib/types'
+import LibroManual from '@/components/libros/LibroManual'
+import { Button } from '@/components/ui/button'
 
 export default function AgregarLibroPage() {
   const [libroSeleccionado, setLibroSeleccionado] =
-    useState<GoogleBookResult | null>(null)
+    useState<BookMetadata | null>(null)
+  const [manual, setManual] = useState(false)
   const titulo = useRef<HTMLHeadingElement>(null)
   const ultimaSeleccion = useRef<HTMLElement | null>(null)
 
-  function seleccionar(libro: GoogleBookResult) {
+  function seleccionar(libro: BookMetadata) {
     ultimaSeleccion.current = document.activeElement as HTMLElement
     setLibroSeleccionado(libro)
     requestAnimationFrame(() => titulo.current?.focus())
   }
 
   function volverABuscar() {
+    setManual(false)
     setLibroSeleccionado(null)
     requestAnimationFrame(() => ultimaSeleccion.current?.focus())
   }
@@ -41,17 +45,39 @@ export default function AgregarLibroPage() {
         >
           {libroSeleccionado
             ? 'Un lugar en tu biblioteca'
-            : 'Encuentra tu próxima historia'}
+            : manual
+              ? 'Un libro a tu manera'
+              : 'Encuentra tu próxima historia'}
         </h1>
         <p className="mb-7 mt-3 text-sm leading-relaxed text-ink/75">
           {libroSeleccionado
             ? 'Guarda esta edición y lo que quieras recordar de ella.'
-            : 'Busca el libro que quieres guardar y elige tu edición.'}
+            : manual
+              ? 'Escribe los datos que conoces. No necesitas una búsqueda externa.'
+              : 'Busca el libro que quieres guardar y elige tu edición.'}
         </p>
       </div>
-      <div hidden={!!libroSeleccionado}>
+      <div hidden={!!libroSeleccionado || manual}>
         <BuscadorGoogleBooks onSeleccionar={seleccionar} />
+        <div className="mt-6 border-t border-rule pt-5">
+          <p className="mb-3 text-sm">
+            ¿No aparece tu libro o prefieres escribir sus datos?
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => {
+              ultimaSeleccion.current = document.activeElement as HTMLElement
+              setManual(true)
+              requestAnimationFrame(() => titulo.current?.focus())
+            }}
+          >
+            Añadir libro manualmente
+          </Button>
+        </div>
       </div>
+      {manual && !libroSeleccionado && (
+        <LibroManual onSeleccionar={seleccionar} onCancelar={volverABuscar} />
+      )}
       {libroSeleccionado && (
         <LibroFormPersonal
           libroSeleccionado={libroSeleccionado}
