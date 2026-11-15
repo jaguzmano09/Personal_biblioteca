@@ -2,7 +2,7 @@
 
 Date: November 14, 2026, America/Bogota. Target: https://tinteruna.vercel.app. Reviewed production revision: `b0894f7`, confirmed READY on Vercel from `main`.
 
-The owner authorized an unfamiliar-reader walkthrough and test-account access. This is a review of observed behavior, not an implementation or a launch-readiness certification. Findings below remain open.
+The owner authorized an unfamiliar-reader walkthrough and test-account access. This records the original observed behavior, not a launch-readiness certification. Preserve the reproduction evidence below; the [implementation follow-up](#implementation-follow-up) records subsequent corrections and release checks.
 
 ## Scope and evidence
 
@@ -182,3 +182,22 @@ This was one synthetic account on the real service. It did not test another exis
 The agent-browser download helper canceled in both Edge and Chrome. An independent Playwright-driven Chrome download succeeded and its contents were checked, so the helper problem was not counted as an application defect. Shell/reference-selector mistakes during navigation were likewise excluded from the findings.
 
 The book was deleted through the normal UI. The temporary account was then removed using its exact identifier and QA marker. A follow-up administrative check confirmed zero remaining QA accounts, books, goals or sessions, and the original two-account total was restored. Temporary credential/session/export files and the dedicated browser credential profile were removed; review browsers were closed. Only redacted documentation and ignored local evidence remain. No application, database-schema, provider-setting or deployment fix was made as part of this review.
+
+## Implementation follow-up
+
+The owner subsequently authorized corrections. The following application changes are committed locally on `main`; the original production findings above remain a historical record of revision `b0894f7`. Do not equate implementation with a completed production release.
+
+| Finding | Implemented correction | Evidence and release boundary |
+| --- | --- | --- |
+| ISSUE-001 | Public Spanish privacy, terms and help links; two independent unchecked acceptance controls; server validation of the notice version | Responsive actual-component and public-page checks passed. Legal/operational review and durable authorization evidence remain open. |
+| ISSUE-002 | Adult self-registration, an assisted route for ages 15–17, and an under-15 unavailable state before credentials | Browser and server tests passed. This is guidance and application validation, not verified age/guardian authority or provider-wide enforcement. |
+| ISSUE-003 | Recovery entry, conditional email request feedback, fixed callback flow, expired-link guidance and password-update page | Unit/hook tests passed. Real-provider authenticated password update/sign-out/new-password sign-in passed locally. Inbox delivery, exact production callback allowlist and recovery-link consumption remain release checks. |
+| ISSUE-004 | Confirmation-renewal page and links from registration success/confirmation error | Request feedback and cooldown passed with fixture mail boundaries; actual provider delivery/confirmation remains a release check. |
+| ISSUE-005 | Completing an undated book suggests the current year and explains its goal effect; historical/unknown dates remain deliberate choices | Real Supabase completion advanced the goal to 1 of 2 and survived reload/export. Historical/undated choices passed component checks. |
+| ISSUE-006 | Goal acknowledgement survives revalidated props and clears for a new year/edit | Passed an actual server-action/RSC refresh with an isolated real account. |
+| ISSUE-007 | Public help/contact and dynamic notice identity from five private server settings | All five encrypted Vercel production settings saved successfully. Contact remains intentionally public at runtime, outside Git/client bundles. A new web deployment must activate it. |
+| ISSUE-008 | Manual metadata entry independent of catalog results, followed by the existing personal-reading flow | Real Supabase manual creation/export passed. Server forces null provider ID and verified ownership; no migration needed. |
+
+Verification passed 41 tests, TypeScript/build and anonymous production-build smoke checks. Playwright exercised actual UI at 320, 390, 768 and 1440 px; axe and the scoped design detector returned zero findings. Fixture mail requests did not send messages. Real-provider checks used a separate administratively confirmed QA account and a local production build, rather than the deployed web revision. The password journey caught and corrected a success-state regression after session closure. Mobile consent labels were also visually corrected and rechecked.
+
+The account, books, goals and sessions were removed with an exact QA identifier/marker. Follow-up counts were zero, with the two original accounts preserved. Temporary credentials were deleted; browsers/local test servers were closed. Screenshots use synthetic account/operator details and remain ignored. `send-auth-email` version 13 is active with its existing signed-webhook protection; app commits are not pushed by this increment. Physical phones, actual mail links and the separate launch-readiness backlog remain unverified.

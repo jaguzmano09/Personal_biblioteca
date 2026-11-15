@@ -4,24 +4,31 @@ Last updated on November 14, 2026. This is the current working record for Tinter
 
 ## Current state
 
-Tinteruna is a private reading journal with a Spanish interface, editorial typography and a mobile-first direction. The initial launch market is Colombia. The intended audience older than 14 includes adolescents whose registration requires further safeguards and review.
+Tinteruna is a private reading journal with a Spanish interface, editorial typography and a mobile-first direction. The initial launch market is Colombia. Adults have guided self-registration; ages 15–17 have an assisted contact route whose authorization and verification require operational review.
 
 | Area | Implemented | Verification and remaining work |
 | --- | --- | --- |
 | Public welcome and identity | Illustrated story, interactive temporary journal preview, shared literary typography and magical-realism artwork | Anonymous production pages and isolated components reviewed at four widths; zero axe findings in checked views. Physical-device review remains open. |
-| Access | Registration, confirmation, sign-in and sign-out | Live sign-in/sign-out and protected-library denial passed with an isolated account. Public signup/email delivery, recovery and complete account lifecycle remain open. |
-| Library | A prominent reading dashboard before the catalog, current-reading continuation, mobile navigation, filters, sorting, annual goals, reading-state detail and inline notes | Live goal/book/note persistence, completion, filters and confirmed deletion passed. Missing reading-year guidance and goal-save feedback are open findings. Physical-device review remains open. |
-| Discovery and addition | Explicit Google Books search, edition comparison, optional personal note, recoverable save errors and bookmark confirmation | Live Google Books edition search and addition passed. No-result discovery lacks a manual-book fallback. Earlier isolated checks covered save recovery and keyboard focus. |
-| Privacy controls | Private JSON export and a protected data/contact page | Live downloaded JSON matched the isolated account and its test records. Public notices and a usable deployed privacy/support contact remain open findings. |
-| Launch preparation | Data-flow inventory, readiness assessment and internal legal drafts | Approved notices, adolescent safeguards, retention, recovery/closure operations and provider evidence remain open. |
+| Access | Guided registration with separate choices, confirmation renewal, recovery, password update, sign-in and sign-out | Real Supabase password update/new-password sign-in passed through a local production build. Inbox delivery, recovery-link consumption and production callback allowlist still need release checks. |
+| Library | Dashboard before the catalog, annual goals, current-reading continuation, filters, detail and inline notes; completion suggests the current year | Real Supabase persistence/reload, goal acknowledgement and completion-to-goal checks passed. Explicit historical/undated choices passed in actual-component fixtures. Physical-device review remains open. |
+| Discovery and addition | Google Books search/edition comparison and manual metadata entry, with the shared personal-note/save journey | Live Google Books search passed in the original audit; new manual creation, decimal score and export passed against real Supabase through the local production build. |
+| Privacy controls | Private JSON export, public Spanish privacy/terms/help pages and private server contact configuration | Public notices passed responsive/axe checks with fictional contact details. Five encrypted production settings are saved; the web deployment must activate the pages/contact. |
+| Launch preparation | Data-flow inventory, notices, separate registration controls, assisted contact path and documented request handling | Legal/operational review, verified adolescent authorization, durable acceptance evidence, retention/backups, closure and provider evidence remain open. |
 | Repository | English documentation grouped by purpose, shared agent instructions and ignored local tool state | Local links, repository exposure checks and documentation consistency reviewed with this increment. |
 | Production origin | Tinteruna is canonical; the legacy production hostname redirects with HTTP 308 | Published in Vercel project-level routing. Passed 22 live HTTP assertions, including paths, queries, anonymous access boundaries and no loops. Authenticated migration remains untested. |
 
 ## Publication status
 
-The owner published the dashboard commits. On November 14, a read-only Vercel check confirmed the production deployment as READY from `main` commit `b0894f7`, and the first-reader review exercised that live version. The previously published canonical-origin routing rule remains independent of application releases. This review's report and progress updates are local documentation until explicitly published; the findings have not been implemented. Email delivery, recovery, physical-device and remaining launch checks still need evidence.
+The owner previously published the dashboard commits. The last verified web production revision is READY `b0894f7`; the first-reader review exercised that live version. The eight reviewed findings now have application corrections committed locally on `main`, without a push or web deployment in this increment. The canonical-origin rule remains active. Five encrypted Vercel production operator settings were saved and the backward-compatible recovery mail hook is active as version 13. The next web deployment must activate the code/settings, followed by public contact, redirect-allowlist, actual email delivery and recovery/confirmation-link acceptance checks. Local real-provider testing does not establish that those production paths have passed.
 
 ## Change record
+
+### November 14, 2026 — Remediation evidence and release handoff
+
+- Updated the [original review](../qa/first-reader-review-2026-11-14.md#implementation-follow-up) with a correction/evidence matrix for all eight findings, preserving the original production observations. Updated setup, operations, legal-draft status, design provenance and the privacy baseline follow-up.
+- Final verification: 41 passing tests, production build/TypeScript, anonymous smoke checks, four-width actual-UI browser checks, zero axe findings and zero scoped detector findings. Repository/client exposure checks covered 114 versionable files and 49 built client files without matching configured operator values or credential signatures. Documentation checks passed 36 local links across 12 Markdown files and confirmed current Next.js agent rules/private-file ignores.
+- Implementation commits: `a55b5e9` manual books/completion; `9f937d1` goal acknowledgement; `1679d05` public notices/contact; `e6d13c6` guided registration/access validation; `4d9b61b` recovery/confirmation renewal. Documentation commit: `docs(qa): record remediation evidence and release checks`.
+- No web push/deployment was performed. Five production environment settings and mail-function version 13 are saved/active as described above. Production contact, exact recovery callback allowlist and actual mail-link flows remain release acceptance tasks; physical-device and broader legal/security launch work remain open. No existing user data or password was changed, and all isolated QA data/credentials were removed.
 
 ### November 14, 2026 — Recovery and confirmation renewal
 
@@ -128,9 +135,8 @@ Verification passed 36 tests, TypeScript, the production build, anonymous smoke 
 
 ## Next work
 
-1. Resolve the [first-reader findings](../qa/first-reader-review-2026-11-14.md), starting with the finish-book/year-to-goal journey and access recovery. Follow with physical-phone keyboard and device checks.
-2. Complete recovery, account correction, closure and withdrawal procedures with proportionate identity verification and retention/backup decisions.
-3. Implement and review the adolescent registration safeguards for the intended Colombia audience.
-4. Finalize Spanish legal notices and terms, consent/acceptance controls where applicable, and pre-registration links after the operational facts are confirmed.
-5. Address the recorded security and provider findings, then review public-launch readiness.
-6. Review the implemented welcome and library on physical phones, then refine the identity using reader feedback and observed task completion.
+1. Publish the local application commits when instructed, verify the public operator contact and exact recovery callback allowlist, and exercise real confirmation/resend/recovery emails and expired links. See the [finding resolution matrix](../qa/first-reader-review-2026-11-14.md#implementation-follow-up).
+2. Complete operational/legal review of the published notices, rights/closure/withdrawal handling and retention/backup decisions.
+3. Review proportionate guardian verification, the adolescent's participation, durable authorization evidence and provider-level signup enforcement before opening assisted enrollment.
+4. Address the separate recorded security/provider findings, then reassess public-launch readiness.
+5. Review physical-phone keyboards and devices, then refine the identity using reader feedback and observed task completion.

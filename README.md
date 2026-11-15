@@ -10,14 +10,17 @@ Users can discover books through Google Books, maintain their own catalog, recor
 
 - An illustrated public welcome with Tinteruna's story and a temporary, browser-only reading journal preview.
 - A shared literary identity across access, library, reading notes and data controls, with mobile navigation.
-- Email/password registration, email confirmation and cookie-based sessions.
-- Private book creation, editing and deletion.
+- Adult self-registration with separate terms/data controls, an assisted adolescent route, email confirmation and cookie-based sessions.
+- Password recovery, confirmation renewal and signed-in password changes.
+- Private book creation, editing and deletion, including manual books outside Google Books.
 - Google Books search by title, author or ISBN, with a server-side API key.
 - Reading states: pending, reading, completed and abandoned.
 - Scores from 0 to 10, personal analysis, favorite characters and quotations.
 - Reading year/month, physical/digital format and book provenance.
 - Catalog search, filters, sorting and incremental display of 50 books.
 - Annual goals and statistics based **only on completed books** in the selected year.
+- Completing an undated book suggests the current year; readers can change or deliberately remove it.
+- Public Spanish privacy, terms and help pages, with operator contact loaded from private server configuration.
 - A protected data page with a private JSON export of books, notes, quotations, goals and basic account identity.
 
 ## Stack and requirements
@@ -61,10 +64,12 @@ All settings used by this application are **server-only**. Do not add `NEXT_PUBL
 | `SUPABASE_ANON_KEY` | Yes | Supabase `anon` JWT or publishable key; RLS must be active |
 | `SITE_URL` | Yes | Exact application origin, e.g. `https://example.com`; no path/query |
 | `GOOGLE_BOOKS_API_KEY` | Recommended | Google Books API key used only by the server |
-| `TINTERUNA_OPERATOR_NAME`, `TINTERUNA_PRIVACY_EMAIL` | For the data-page contact | Operator identity and privacy/support channel, configured privately |
-| `TINTERUNA_OPERATOR_CITY`, `TINTERUNA_OPERATOR_ADDRESS`, `TINTERUNA_OPERATOR_PHONE` | For preparing legal notices | Operator contact details, configured privately |
+| `TINTERUNA_OPERATOR_NAME`, `TINTERUNA_PRIVACY_EMAIL` | For registration and public notices | Operator identity and privacy/support channel, configured privately |
+| `TINTERUNA_OPERATOR_CITY`, `TINTERUNA_OPERATOR_ADDRESS`, `TINTERUNA_OPERATOR_PHONE` | For registration and public notices | Operator contact details, configured privately |
 
 Never use `service_role` or an `sb_secret_` key in this application. Privileged keys can bypass RLS. Configuration rejects known privileged key formats. HTTP is accepted for `SITE_URL` only on localhost/127.0.0.1.
+
+All five operator settings must be present to enable application self-registration. Contact values remain outside Git and client bundles, but are intentionally readable on the public privacy/help pages after deployment. See [public-user operations](docs/operations/deployment.md#public-user-operations) for assisted registration and rights requests.
 
 ## Database setup and migration
 

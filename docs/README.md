@@ -1,6 +1,6 @@
 # Documentation
 
-Read [platform progress](project/progress.md) for the current implementation state and outstanding work. Repository documentation is written in English. Product-facing copy is in Spanish, including the legal notices that will be prepared for publication.
+Read [platform progress](project/progress.md) for the current implementation state and outstanding work. Repository documentation is written in English. Product-facing copy, including the implemented privacy, terms and help notices, is in Spanish.
 
 | Area | Document | Purpose |
 | --- | --- | --- |

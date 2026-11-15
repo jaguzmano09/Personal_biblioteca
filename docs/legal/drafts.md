@@ -2,6 +2,8 @@
 
 Working version 0.1, prepared on November 10, 2026. These internal English drafts require legal review and operational decisions before publication. The approved user-facing documents will be written in Spanish. Their effective date will be set when publication is approved.
 
+Implementation update, November 14: Spanish `/privacidad`, `/terminos` and `/ayuda` notices are now implemented, with versioned separate registration controls and dynamic operator values from private server configuration. They describe the current product and assisted contact route; this does not certify legal approval. The English text below remains historical drafting context. Review the actual Spanish pages for publication. Retention/backups, processor arrangements, durable authorization evidence and verified assisted enrollment remain open. User-editable acceptance metadata alone is not a durable legal record. See [public-user operations](../operations/deployment.md#public-user-operations).
+
 ## Decisions required before publication
 
 - Load the operator's details from private server environment variables when preparing the notice, following Article 2.2.2.25.3.1 of Decree 1074 of 2015. The details were supplied for local configuration. Details displayed in a published notice will be readable by its visitors.
