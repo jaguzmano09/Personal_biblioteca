@@ -13,13 +13,48 @@
   --color-rule: var(--brand-rule);
   --color-gilt: var(--brand-gilt);
   --color-surface: var(--brand-surface);
-  --color-muted: var(--brand-muted);
   --color-footer: var(--brand-footer);
   --color-paper-end: var(--brand-paper-end);
   --color-stamp-dark: var(--brand-stamp-dark);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
 body {
+  --background: var(--brand-paper);
+  --foreground: var(--brand-ink);
+  --primary: var(--brand-cloth);
+  --primary-foreground: var(--brand-surface);
+  --secondary: var(--brand-paper);
+  --secondary-foreground: var(--brand-cloth);
+  --muted: var(--brand-rule);
+  --muted-foreground: color-mix(
+    in srgb,
+    var(--brand-ink) 78%,
+    var(--brand-paper)
+  );
+  --accent: color-mix(in srgb, var(--brand-cloth) 12%, var(--brand-paper));
+  --accent-foreground: var(--brand-cloth);
+  --card: var(--brand-surface);
+  --card-foreground: var(--brand-ink);
+  --destructive: var(--brand-stamp-dark);
+  --border: var(--brand-rule);
+  --input: color-mix(in srgb, var(--brand-cloth) 60%, var(--brand-paper));
+  --ring: var(--brand-cloth);
   background-color: var(--brand-paper);
   color: var(--brand-ink);
   font-family: var(--type-body), system-ui, sans-serif;
