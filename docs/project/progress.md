@@ -1,12 +1,12 @@
 # Platform progress
 
-Last updated on November 10, 2026. This is the current working record for Tinteruna. Update it with each completed increment, including changes, evidence, open work and publication status.
+Last updated on November 14, 2026. This is the current working record for Tinteruna. Update it with each completed increment, including changes, evidence, open work and publication status.
 
 ## Current state
 
 Tinteruna is a private reading journal with a Spanish interface, editorial typography and a mobile-first direction. The initial launch market is Colombia. The intended audience older than 14 includes adolescents whose registration requires further safeguards and review.
 
-| Area | Implemented locally | Verification and remaining work |
+| Area | Implemented | Verification and remaining work |
 | --- | --- | --- |
 | Public welcome and identity | Illustrated story, interactive temporary journal preview, shared literary typography and magical-realism artwork | Anonymous production pages and isolated components reviewed at four widths; zero axe findings in checked views. Physical-device review remains open. |
 | Access | Registration, confirmation, sign-in and sign-out | Anonymous boundaries checked locally. Real authenticated recovery and complete account lifecycle remain open. |
@@ -15,12 +15,22 @@ Tinteruna is a private reading journal with a Spanish interface, editorial typog
 | Privacy controls | Private JSON export and a protected data/contact page | Tests cover ownership filters, pagination, anonymous denial and safe failure. Real authenticated export remains open. |
 | Launch preparation | Data-flow inventory, readiness assessment and internal legal drafts | Approved notices, adolescent safeguards, retention, recovery/closure operations and provider evidence remain open. |
 | Repository | English documentation grouped by purpose, shared agent instructions and ignored local tool state | Local links, repository exposure checks and documentation consistency reviewed with this increment. |
+| Production origin | Tinteruna is canonical; the legacy production hostname redirects with HTTP 308 | Published in Vercel project-level routing. Passed 22 live HTTP assertions, including paths, queries, anonymous access boundaries and no loops. Authenticated migration remains untested. |
 
 ## Publication status
 
-The historical handoff reported publication of `ae7a23f`. Before the identity increment, local `main` and its tracking reference were at `619106b`, including documentation organization and the earlier mobile/privacy changes below. The identity increment is committed locally on `main`; this work does not publish or deploy it. Hosted deployment state, private environment configuration and authenticated acceptance checks require separate evidence.
+On November 14, a read-only Vercel check confirmed the production deployment as READY from `main` commit `dbd3b67`, including the identity increment below. Both production domains resolved to that deployment. The canonical-origin routing rule was then published separately in Vercel, without rebuilding, redeploying or pushing application code. This increment's repository changes document the live operational configuration and remain local until explicitly published. Complete authenticated acceptance and private provider-setting checks still require separate evidence.
 
 ## Change record
+
+### November 14, 2026 — One public Tinteruna origin
+
+- Confirmed that `tinteruna.vercel.app` and `personal-biblioteca.vercel.app` are domains of the same project and production deployment. Both previously served the application independently, allowing separate browser sessions per origin. The callback already used the Tinteruna origin.
+- Published **Canonical Tinteruna origin**, a narrowly scoped Vercel project-level 308 redirect from the legacy hostname to Tinteruna. Staged and reviewed the one-rule diff before promotion. Kept preview hosts, deployment protection, application code, provider settings and database unchanged.
+- Passed 22 public HTTP assertions covering root/access/library/asset/callback routes, exact path and query preservation (including encoded and repeated parameters), HEAD/POST redirect responses on an inert path, no legacy session cookies, no redirect loops and preserved anonymous library/export denial on the primary origin.
+- Recorded the configuration, verification procedure, browser-session transition and rollback in [deployment operations](../operations/deployment.md). Actual confirmation delivery and authenticated session migration were not exercised.
+- Applied the Vercel domain, CLI and routing guidance; reviewed the existing Supabase callback boundary. No additional dependency or skill installation was required.
+- Documentation commit: `docs(hosting): record the canonical Tinteruna origin`.
 
 ### November 10, 2026 — Public welcome and platform identity
 

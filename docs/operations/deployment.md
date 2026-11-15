@@ -1,5 +1,35 @@
 # Deployment and release checks
 
+## Canonical production origin
+
+The public origin is **https://tinteruna.vercel.app**. The legacy address, `https://personal-biblioteca.vercel.app`, redirects there with HTTP 308. Both domains belong to the existing `personal-biblioteca` Vercel project and resolve to the same production deployment; they are not separate applications or databases.
+
+On November 14, 2026, the project-level routing rule **Canonical Tinteruna origin** was staged, its diff reviewed, then promoted. Project-level routes run before deployment routes and persist independently of application releases. This operational configuration lives in Vercel, not in `next.config.js` or `vercel.json`. Domain metadata may still list both addresses without a domain-level redirect: the project-level rule is what enforces the public redirect.
+
+Its configuration is:
+
+```json
+{
+  "name": "Canonical Tinteruna origin",
+  "enabled": true,
+  "srcSyntax": "regex",
+  "route": {
+    "src": "^/(.*)$",
+    "has": [{ "type": "host", "value": "personal-biblioteca.vercel.app" }],
+    "dest": "https://tinteruna.vercel.app/$1",
+    "status": 308
+  }
+}
+```
+
+The host condition limits the change to the legacy production address. Preview/deployment hosts and their protection settings are unchanged. Requests retain their path and query parameters, including callback parameters. HTTP 308 preserves the request method. The legacy origin redirects before application session handling, rather than creating another independent session.
+
+Keep production `SITE_URL` and Supabase's approved production callback at `https://tinteruna.vercel.app` and `https://tinteruna.vercel.app/api/auth/callback`, respectively. The live callback's missing-code response was verified to use the Tinteruna origin; this increment did not change environment variables or Supabase Auth settings. New registrations and sign-ins should always begin at Tinteruna. Browser cookies are scoped to their original host: a reader signed in only on the legacy origin may need to sign in again. An unfinished PKCE confirmation begun on the old host may require restarting the flow on Tinteruna; no cookies or credentials are copied across domains.
+
+After a routing change, check the legacy root, login, registration, protected pages, assets and callback using redirects disabled. Each must return 308 with the exact equivalent Tinteruna URL. Include an encoded query and repeated parameters. Follow a few redirects to verify there is no loop. Check that the primary home/login remain available, `/biblioteca` still redirects signed-out visitors to `/login`, and anonymous `/api/account/export` remains 401. November 14 verification passed 22 live HTTP assertions, including HEAD/POST responses on an inert path and no session cookie being set by legacy redirects. No real confirmation code or authenticated account was used.
+
+To reverse the operational rule, open this project's CDN routing settings, disable **Canonical Tinteruna origin**, inspect the staged diff and publish it. The equivalent API workflow edits the existing rule and promotes its staged version. Review the current rules first so that unrelated changes are preserved. Permanent redirects may already be cached by clients; disabling the rule cannot clear those client caches. Do not remove either domain or change DNS to roll back this rule.
+
 ## Database and application rollout
 
 - Take a recoverable backup; apply the migration to staging first.
