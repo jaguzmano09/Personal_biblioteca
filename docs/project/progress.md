@@ -10,7 +10,7 @@ Tinteruna is a private reading journal with a Spanish interface, editorial typog
 | --- | --- | --- |
 | Public welcome and identity | Illustrated story, interactive temporary journal preview, shared literary typography and magical-realism artwork | Anonymous production pages and isolated components reviewed at four widths; zero axe findings in checked views. Physical-device review remains open. |
 | Access | Registration, confirmation, sign-in and sign-out | Anonymous boundaries checked locally. Real authenticated recovery and complete account lifecycle remain open. |
-| Library | Current-reading continuation, mobile navigation, filters, sorting, annual goals, reading-state detail and inline notes | Regression checks cover data validation and PostgreSQL isolation. Isolated browser checks cover filters, goals, note retry and all four states. Real authenticated persistence and device review remain open. |
+| Library | A prominent reading dashboard before the catalog, current-reading continuation, mobile navigation, filters, sorting, annual goals, reading-state detail and inline notes | Regression checks cover data validation and PostgreSQL isolation. Dashboard browser checks cover six widths, goal recovery, asynchronous year changes and empty/long-content states. Real authenticated persistence and physical-device review remain open. |
 | Discovery and addition | Explicit Google Books search, edition comparison, optional personal note, recoverable save errors and bookmark confirmation | Isolated browser checks cover 360, 390, 768 and 1366 px, short viewports and keyboard focus. Real provider/save persistence remains open. |
 | Privacy controls | Private JSON export and a protected data/contact page | Tests cover ownership filters, pagination, anonymous denial and safe failure. Real authenticated export remains open. |
 | Launch preparation | Data-flow inventory, readiness assessment and internal legal drafts | Approved notices, adolescent safeguards, retention, recovery/closure operations and provider evidence remain open. |
@@ -19,9 +19,19 @@ Tinteruna is a private reading journal with a Spanish interface, editorial typog
 
 ## Publication status
 
-On November 14, a read-only Vercel check confirmed the production deployment as READY from `main` commit `dbd3b67`, including the identity increment below. Both production domains resolved to that deployment. The canonical-origin routing rule was then published separately in Vercel, without rebuilding, redeploying or pushing application code. This increment's repository changes document the live operational configuration and remain local until explicitly published. Complete authenticated acceptance and private provider-setting checks still require separate evidence.
+On November 14, a read-only Vercel check confirmed the production deployment as READY from `main` commit `dbd3b67`, including the identity increment below. Both production domains resolved to that deployment. The canonical-origin routing rule was then published separately in Vercel, without rebuilding, redeploying or pushing application code. The hosting documentation commit `1d3b362` and subsequent dashboard work remain local until explicitly published. Complete authenticated acceptance and private provider-setting checks still require separate evidence.
 
 ## Change record
+
+### November 14, 2026 — Reading progress before the catalog
+
+- Moved the dashboard from the end of the mobile catalog/narrow desktop sidebar to a full-width section before the books. A compact library heading leaves room for the annual goal, current-reading action and selected-year metrics.
+- Added contextual encouragement grounded in actual completed readings, with clear no-goal and achieved/exceeded states. The next-reading action prefers a current book, then a pending book, then discovery, without automatically modifying any book.
+- Installed and applied the official shadcn skill at the owner's request. Integrated reviewed source components with Tinteruna semantic colors, 48 px used controls, visible focus and reduced-motion behavior. Source provenance and MIT attribution are in [design decisions](../design/frontend-skills.md).
+- Added goal-load retry, preserved edits on save errors, cancellation with focus restoration and protection against outdated year responses. Existing authenticated server actions, ownership checks and completed-only statistics remain unchanged.
+- Verification passed 36 regression tests, TypeScript, production build and anonymous smoke checks. The dependency audit reported zero vulnerabilities. Browser checks of actual components with fixture boundaries covered 320/360/390/768/1024/1440 px, loading/save failures and retry, cancellation, out-of-order loads, empty libraries, absent/achieved/exceeded goals, long content, large values, zero scores, broken covers, short viewports and reduced motion. Axe and the scoped mechanical design detector returned zero findings. Live authenticated persistence remains unverified.
+- No provider, database, production-routing or deployment changes are part of this increment. The earlier live canonical-domain redirect remains independent of these local changes.
+- Commit sequence: `feat(ui): integrate branded shadcn reading controls`; `feat(dashboard): put reading progress before the catalog`; `docs(dashboard): record the mobile reading experience`.
 
 ### November 14, 2026 — One public Tinteruna origin
 

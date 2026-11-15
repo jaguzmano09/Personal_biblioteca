@@ -48,3 +48,25 @@ Final generation prompt:
 ### Verification boundaries
 
 Production anonymous pages and isolated actual private components were checked at 360, 390, 768 and 1440 px. Playwright exercised the journal preview, access forms, library filters and annual goals, all four reading states, note-save failure/retry and confirmation, plus responsive addition and data pages. Axe reported zero findings in the checked views. The mechanical detector found one existing thick cover border, which was reduced. Inert markup remained text without script execution. These checks establish rendered behavior with fixture action boundaries; they do not establish real authenticated persistence, legal readiness or physical-device usability.
+
+## Reading dashboard prominence — November 14, 2026
+
+The owner requested the official shadcn/ui skills as the primary guidance for this increment. The relevant [shadcn skill](https://github.com/shadcn-ui/ui/tree/e62c9435fff729a175f38983dee73b2cb4f6a069/skills/shadcn) was inspected and installed in the personal skills directory, pinned to `e62c9435fff729a175f38983dee73b2cb4f6a069`. The repository's Radix-to-Base migration skill was not applicable to this existing application. Frontend-design, responsive-design and Impeccable supplied supporting review; agent-browser supplied the initial rendered inspection and Playwright covered asynchronous cases.
+
+The diagnosis was structural: the annual dashboard appeared after the entire catalog on mobile and in a narrow sidebar on desktop. The revised reading order is:
+
+```text
+Library heading
+Reading rhythm + year
+Annual goal | Continue the current book   (stacked on phones)
+Completed-reading metrics
+Catalog search, filters and books
+```
+
+The large library banner was replaced by a compact heading. The existing ink-river artwork now frames the next-reading action. Forest, ivory, terracotta and the existing Fraunces/Inter typography remain authoritative. Goal progress uses real completed-book counts, with supportive copy for the first book, remaining books, completed goals and previous years. The next-reading action prefers a book being read, then a pending book, then discovery. Opening a suggested book does not change its reading state. The next-reading choice is independent of the selected statistical year and catalog filters.
+
+Official CLI `4.23.0` inspected the Next.js/Tailwind v4 project and generated the Radix components through `add` after a dry run and source review. `components.json` records this incremental integration using the existing stylesheet and aliases. No full preset, font or application initialization was applied. The incorporated primitives are Button, Progress, Field, Input, NativeSelect, Skeleton and Alert, with Label/Separator dependencies. [The upstream MIT notice](shadcn-license.txt) accompanies the source. Runtime dependencies are `cn` 0.5.2, `radix-ui` 1.8.1 and the explicitly declared `class-variance-authority` 0.7.1; the lockfile records their dependency tree.
+
+Semantic shadcn colors map to Tinteruna's existing variables on the body, where the brand variables are defined. Component variants use those tokens. Used buttons and form controls have 48 px targets, input text remains 16 px, and loading/progress animation respects reduced motion. The progress wrapper passes its value to Radix so its accessible state matches its visual fill. The annual goal editor supports cancellation, restores focus after closing, preserves drafts on failure and locks the year while saving. Failed goal loads offer retry instead of presenting an unknown goal as absent; obsolete responses from another year are ignored.
+
+Browser verification used actual components with fictional data and fixture action boundaries at 320, 360, 390, 768, 1024 and 1440 px. Checks covered ordering before the catalog, goal editing/cancellation/error/retry, out-of-order year responses, no goal, achieved/exceeded goals, pending-book fallback, empty libraries, long unbroken content, large values, zero scores, broken covers, short viewports and reduced motion. Axe reported zero findings in the checked views; the scoped mechanical detector also returned no findings. These results do not establish authenticated persistence or physical-phone usability.
