@@ -6,11 +6,17 @@ import { LockKeyhole, Loader2 } from 'lucide-react'
 import { iniciarSesion } from '@/lib/auth'
 import AuthShell from './AuthShell'
 import PasswordInput from './PasswordInput'
+import CaptchaChallenge, {
+  noChallenge,
+  type ChallengeConfig
+} from './CaptchaChallenge'
 
 export default function LoginForm({
-  confirmationError = false
+  confirmationError = false,
+  challenge = noChallenge
 }: {
   confirmationError?: boolean
+  challenge?: ChallengeConfig
 }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -20,6 +26,8 @@ export default function LoginForm({
       : null
   )
   const [cargando, setCargando] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState('')
+  const [challengeVersion, setChallengeVersion] = useState(0)
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -27,13 +35,13 @@ export default function LoginForm({
     setCargando(true)
     setError(null)
     try {
-      const resultado = await iniciarSesion(email, password)
+      const resultado = await iniciarSesion(email, password, captchaToken)
       if (resultado?.error) setError(resultado.error)
     } catch {
-      setError(
-        'No se pudo iniciar sesión. Revisa tu conexión e inténtalo de nuevo.'
-      )
+      setError('No se pudo iniciar sesión. Revisa tu conexión e inténtalo de nuevo.')
     } finally {
+      setCaptchaToken('')
+      setChallengeVersion(value => value + 1)
       setCargando(false)
     }
   }
@@ -92,9 +100,15 @@ export default function LoginForm({
               {error}
             </p>
           )}
+          <CaptchaChallenge
+            key={challengeVersion}
+            config={challenge}
+            action="login"
+            onToken={setCaptchaToken}
+          />
           <button
             type="submit"
-            disabled={cargando}
+            disabled={cargando || (challenge.required && !captchaToken)}
             className="editorial-button w-full"
           >
             {cargando && (

@@ -1,4 +1,5 @@
 import CorreoAcceso from '@/components/auth/CorreoAcceso'
+import { authChallengeConfig } from '@/lib/auth-security'
 export default async function Recuperar({
   searchParams
 }: {
@@ -6,6 +7,7 @@ export default async function Recuperar({
 }) {
   return (
     <CorreoAcceso
+      challenge={authChallengeConfig()}
       kind="recovery"
       expired={(await searchParams).error === 'expired'}
     />

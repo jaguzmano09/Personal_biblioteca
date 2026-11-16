@@ -23,6 +23,14 @@ The owner previously published the dashboard commits. The last verified web prod
 
 ## Change record
 
+### November 15, 2026 — Turnstile-ready access forms
+
+- Integrated pinned `@marsidev/react-turnstile` 1.6.3 into the existing login, adult signup, recovery and confirmation-renewal forms. The compact Spanish challenge fits 320 px, uses existing shadcn feedback/retry controls, and preserves Tinteruna typography/colors and entered credentials. Tokens remain in memory and reset after every request; expiry, timeout, unsupported browser, script failure and retry are covered. Switching age paths invalidates the previous challenge.
+- Server-rendered pages provide only the public site key/requirement, with confirmation rendered dynamically. Disabled protection loads no Cloudflare script; required missing configuration blocks submission. Conditional public privacy copy describes Cloudflare processing and pseudonymous attempt counters without claiming real protection is already active.
+- Applied official shadcn, responsive, Impeccable, React, Supabase and browser-testing guidance. Installed the official Cloudflare Turnstile skill at pinned revision `cbf893b954222276bf1af57e5f23379231e0efb9`; registered its MCP and completed OAuth at the owner's explicit request. The current session cannot invoke the newly registered server until Codex reloads. Actual widget creation, Supabase provider enforcement and real-token/replay acceptance remain pending, not silently bypassed or certified by fixtures.
+- Verification: 54 tests, TypeScript/build/smoke; browser checks of actual components with fixture provider/script boundaries at 320/390/768/1440 px, zero axe findings and zero scoped detector findings. Visually checked the synthetic mobile signup. Live limiter/login checks are separate evidence; no real CAPTCHA token, account creation or email-delivery claim is made. Access-action commit: `7edcdd9`.
+- Commit: `feat(auth): add resilient Turnstile access challenges`. Local on `main`; no paid product, DNS change, new branch or web deployment was introduced.
+
 ### November 15, 2026 — Guarded access actions and provider token forwarding
 
 - Applied shared pre-auth checks to login, adult signup, recovery and confirmation resend before their provider operations. Explicit enabled infrastructure/configuration failures deny requests; account-independent mail feedback and fixed callback destinations remain intact. Password changes still require their existing verified session.

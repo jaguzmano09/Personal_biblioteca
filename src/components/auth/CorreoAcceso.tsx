@@ -8,19 +8,27 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import CaptchaChallenge, {
+  noChallenge,
+  type ChallengeConfig
+} from './CaptchaChallenge'
 
 export default function CorreoAcceso({
   kind,
-  expired = false
+  expired = false,
+  challenge = noChallenge
 }: {
   kind: 'recovery' | 'confirmation'
   expired?: boolean
+  challenge?: ChallengeConfig
 }) {
   const [email, setEmail] = useState('')
   const [busy, setBusy] = useState(false)
   const [sent, setSent] = useState(false)
   const [seconds, setSeconds] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState('')
+  const [challengeVersion, setChallengeVersion] = useState(0)
   useEffect(() => {
     if (!seconds) return
     const timer = setTimeout(() => setSeconds(value => value - 1), 1000)
@@ -55,7 +63,7 @@ export default function CorreoAcceso({
           setBusy(true)
           setError(null)
           try {
-            const result = await solicitarCorreo(email, kind)
+            const result = await solicitarCorreo(email, kind, captchaToken)
             if (result.error) setError(result.error)
             else {
               setSent(true)
@@ -66,6 +74,8 @@ export default function CorreoAcceso({
               'No se pudo enviar la solicitud. Revisa tu conexión e inténtalo de nuevo.'
             )
           } finally {
+            setCaptchaToken('')
+            setChallengeVersion(value => value + 1)
             setBusy(false)
           }
         }}
@@ -93,12 +103,21 @@ export default function CorreoAcceso({
         )}
         {sent && (
           <p role="status" className="text-sm leading-relaxed">
-            Si la cuenta corresponde y la solicitud puede procesarse, recibirás
-            un enlace. Por seguridad, esta respuesta no confirma si existe una
-            cuenta con ese correo.
+            Si la cuenta corresponde y la solicitud puede procesarse, recibirás un
+            enlace. Por seguridad, esta respuesta no confirma si existe una cuenta
+            con ese correo.
           </p>
         )}
-        <Button disabled={busy || seconds > 0} type="submit">
+        <CaptchaChallenge
+          key={challengeVersion}
+          config={challenge}
+          action={kind}
+          onToken={setCaptchaToken}
+        />
+        <Button
+          disabled={busy || seconds > 0 || (challenge.required && !captchaToken)}
+          type="submit"
+        >
           {busy
             ? 'Enviando solicitud…'
             : seconds

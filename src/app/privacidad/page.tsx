@@ -85,6 +85,17 @@ export default function Privacidad() {
         código necesario para la acción solicitada. La integración de correo
         utiliza Brevo. No compartas esos enlaces o códigos.
       </p>
+      <p>
+        Cuando la verificación de acceso está habilitada, usamos Cloudflare
+        Turnstile para reducir solicitudes automatizadas. Cloudflare procesa datos
+        técnicos del navegador y de la conexión para esa comprobación. No enviamos
+        tus notas o citas como parte de la verificación. Consulta la{' '}
+        <a className="editorial-link" href="https://www.cloudflare.com/privacypolicy/">
+          información de privacidad de Cloudflare
+        </a>
+        . Los límites de acceso usan identificadores seudonimizados de red y correo
+        en contadores temporales, sin incluir el contenido de tus lecturas.
+      </p>
       <h2>Autorización y tus derechos</h2>
       <p>
         El registro distingue la aceptación de términos de la autorización para

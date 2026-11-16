@@ -1,5 +1,15 @@
 import LoginForm from '@/components/auth/LoginForm'
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+import { authChallengeConfig } from '@/lib/auth-security'
+export default async function LoginPage({
+  searchParams
+}: {
+  searchParams: Promise<{ error?: string }>
+}) {
   const params = await searchParams
-  return <LoginForm confirmationError={params.error === 'confirmation'} />
+  return (
+    <LoginForm
+      challenge={authChallengeConfig()}
+      confirmationError={params.error === 'confirmation'}
+    />
+  )
 }

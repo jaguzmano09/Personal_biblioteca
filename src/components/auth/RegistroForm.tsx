@@ -10,11 +10,17 @@ import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { NOTICE_VERSION } from '@/lib/registration'
+import CaptchaChallenge, {
+  noChallenge,
+  type ChallengeConfig
+} from './CaptchaChallenge'
 
 export default function RegistroForm({
-  enabled = false
+  enabled = false,
+  challenge = noChallenge
 }: {
   enabled?: boolean
+  challenge?: ChallengeConfig
 }) {
   const [age, setAge] = useState('')
   const [terms, setTerms] = useState(false)
@@ -24,6 +30,8 @@ export default function RegistroForm({
   const [error, setError] = useState<string | null>(null)
   const [exito, setExito] = useState(false)
   const [cargando, setCargando] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState('')
+  const [challengeVersion, setChallengeVersion] = useState(0)
   const confirmacion = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
@@ -36,12 +44,17 @@ export default function RegistroForm({
     setCargando(true)
     setError(null)
     try {
-      const resultado = await registrarUsuario(email, password, {
-        age,
-        terms,
-        privacy,
-        version: NOTICE_VERSION
-      })
+      const resultado = await registrarUsuario(
+        email,
+        password,
+        {
+          age,
+          terms,
+          privacy,
+          version: NOTICE_VERSION
+        },
+        captchaToken
+      )
       if (resultado?.error) setError(resultado.error)
       else setExito(true)
     } catch {
@@ -49,6 +62,8 @@ export default function RegistroForm({
         'No se pudo completar el registro. Revisa tu conexión e inténtalo de nuevo.'
       )
     } finally {
+      setCaptchaToken('')
+      setChallengeVersion(value => value + 1)
       setCargando(false)
     }
   }
@@ -71,8 +86,8 @@ export default function RegistroForm({
             className="mt-6 break-words text-base leading-relaxed text-ink/80"
           >
             Si el registro es válido, recibirás un enlace de confirmación en{' '}
-            <strong>{email}</strong>. Abre el enlace en este navegador para
-            confirmar tu cuenta.
+            <strong>{email}</strong>. Abre el enlace en este navegador para confirmar
+            tu cuenta.
           </p>
           <Link href="/login" className="editorial-button mt-7 w-full">
             Ir al inicio de sesión
@@ -99,7 +114,11 @@ export default function RegistroForm({
             <NativeSelect
               id="registration-age"
               value={age}
-              onChange={event => setAge(event.target.value)}
+              onChange={event => {
+                setAge(event.target.value)
+                setCaptchaToken('')
+                setChallengeVersion(value => value + 1)
+              }}
             >
               <NativeSelectOption value="">Elige una opción</NativeSelectOption>
               <NativeSelectOption value="adult">
@@ -130,14 +149,13 @@ export default function RegistroForm({
           )}
           {age === 'under' && (
             <p role="status">
-              El registro de Tinteruna no está disponible para menores de 15
-              años.
+              El registro de Tinteruna no está disponible para menores de 15 años.
             </p>
           )}
           {!enabled && (
             <p role="alert" className="editorial-alert my-4">
-              El registro está temporalmente cerrado mientras se completa el
-              canal de privacidad. Puedes consultar{' '}
+              El registro está temporalmente cerrado mientras se completa el canal de
+              privacidad. Puedes consultar{' '}
               <Link href="/ayuda" className="editorial-link">
                 la ayuda
               </Link>
@@ -209,10 +227,7 @@ export default function RegistroForm({
                       onCheckedChange={value => setTerms(value === true)}
                       required
                     />
-                    <FieldLabel
-                      htmlFor="registration-terms"
-                      className="min-h-12"
-                    >
+                    <FieldLabel htmlFor="registration-terms" className="min-h-12">
                       <span>
                         He leído y acepto los{' '}
                         <Link href="/terminos" className="editorial-link">
@@ -229,13 +244,10 @@ export default function RegistroForm({
                       onCheckedChange={value => setPrivacy(value === true)}
                       required
                     />
-                    <FieldLabel
-                      htmlFor="registration-privacy"
-                      className="min-h-12"
-                    >
+                    <FieldLabel htmlFor="registration-privacy" className="min-h-12">
                       <span>
-                        Autorizo el tratamiento de mis datos para las finalidades
-                        de la{' '}
+                        Autorizo el tratamiento de mis datos para las finalidades de
+                        la{' '}
                         <Link href="/privacidad" className="editorial-link">
                           política de privacidad
                         </Link>
@@ -244,9 +256,20 @@ export default function RegistroForm({
                     </FieldLabel>
                   </Field>
                 </FieldGroup>
+                <CaptchaChallenge
+                  key={challengeVersion}
+                  config={challenge}
+                  action="signup"
+                  onToken={setCaptchaToken}
+                />
                 <button
                   type="submit"
-                  disabled={cargando || !terms || !privacy}
+                  disabled={
+                    cargando ||
+                    !terms ||
+                    !privacy ||
+                    (challenge.required && !captchaToken)
+                  }
                   className="editorial-button w-full"
                 >
                   {cargando && (
