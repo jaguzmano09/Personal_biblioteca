@@ -10,6 +10,7 @@ Read [platform progress](project/progress.md) for the current implementation sta
 | Operations | [Authentication email](operations/auth-email.md) | Signed Supabase Auth hook and Brevo delivery procedures |
 | Operations | [Session cookies](operations/session-security.md) | Server-owned cookie policy, browser evidence and rollout |
 | Operations | [Backups](operations/backups.md) | Verified plan, safe inventory command and backup activation requirements |
+| Operations | [Authentication abuse controls](operations/auth-abuse.md) | Free-plan quotas, CAPTCHA activation, privacy, evidence and future migration |
 | Design | [Frontend skills](design/frontend-skills.md) | Reviewed skill sources, revisions and design decisions |
 | Quality | [First-reader production review](qa/first-reader-review-2026-11-14.md) | Reproduced user-facing issues, authenticated acceptance evidence and correction priorities |
 | Security | [Privacy readiness](security/privacy-readiness.md) | Data flows, launch findings, verification and repository exposure review |

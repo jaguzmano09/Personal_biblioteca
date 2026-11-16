@@ -23,6 +23,8 @@ The intentionally pre-auth public SECURITY DEFINER RPC is executable by app role
 
 The migration adds new objects and a random signing key, without rewriting existing user data. It was verified in isolated PostgreSQL before the additive production application. Its local filename matches the provider migration version. This limited, reversible addition is not evidence that a recoverable database backup exists; it does not waive the backup gate for existing-data/privilege migrations.
 
+The provider migration listing records this new migration, while the older application schema was applied outside that recorded history. Do not run a blanket database push or history repair blindly: inspect the baseline, obtain a recoverable copy and stage the reconciliation first. No legacy migration history was rewritten here.
+
 | Budget | Limit/window |
 | --- | --- |
 | Aggregate auth attempts per IP/prefix | 30 per 60 seconds |

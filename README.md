@@ -12,6 +12,7 @@ Users can discover books through Google Books, maintain their own catalog, recor
 - A shared literary identity across access, library, reading notes and data controls, with mobile navigation.
 - Adult self-registration with separate terms/data controls, an assisted adolescent route, email confirmation and cookie-based sessions.
 - Password recovery, confirmation renewal and signed-in password changes.
+- Shared signed authentication-attempt quotas using the existing database, with Turnstile-ready login/registration/recovery/confirmation forms. See activation status below.
 - Private book creation, editing and deletion, including manual books outside Google Books.
 - Google Books search by title, author or ISBN, with a server-side API key.
 - Reading states: pending, reading, completed and abandoned.
@@ -56,7 +57,7 @@ Open http://localhost:3000.
 
 ### Environment variables
 
-All settings used by this application are **server-only**. Do not add `NEXT_PUBLIC_` variants.
+Settings are read on the server. Do not add `NEXT_PUBLIC_` secret variants. The Turnstile site key is intentionally a public identifier passed to its browser widget; secrets and the limiter signing key remain private.
 
 | Variable | Required | Description |
 | --- | --- | --- |
@@ -66,12 +67,16 @@ All settings used by this application are **server-only**. Do not add `NEXT_PUBL
 | `GOOGLE_BOOKS_API_KEY` | Recommended | Google Books API key used only by the server |
 | `TINTERUNA_OPERATOR_NAME`, `TINTERUNA_PRIVACY_EMAIL` | For registration and public notices | Operator identity and privacy/support channel, configured privately |
 | `TINTERUNA_OPERATOR_CITY`, `TINTERUNA_OPERATOR_ADDRESS`, `TINTERUNA_OPERATOR_PHONE` | For registration and public notices | Operator contact details, configured privately |
+| `TINTERUNA_AUTH_RATE_LIMIT_ENABLED`, `TINTERUNA_AUTH_RATE_LIMIT_SECRET` | For shared attempt enforcement | Explicit flag and a private signing key matching the applied database configuration |
+| `TINTERUNA_CAPTCHA_ENABLED`, `TURNSTILE_SITE_KEY` | For CAPTCHA enforcement | Enable with a real widget and coordinated Supabase Auth Turnstile configuration |
 
 Never use `service_role` or an `sb_secret_` key in this application. Privileged keys can bypass RLS. Configuration rejects known privileged key formats. HTTP is accepted for `SITE_URL` only on localhost/127.0.0.1.
 
 Session and PKCE cookies use a shared server-owned HttpOnly/Secure/Lax policy, with Secure determined by the validated HTTPS origin and a localhost HTTP exception. See [session rollout and verification](docs/operations/session-security.md).
 
 Optional `npm run security:backups` reads provider backup inventory using a privately configured Management token. Its `SUPABASE_ACCESS_TOKEN`/optional `SUPABASE_PROJECT_REF` settings are for local operations, not the web application or its deployment. The current Free-plan backup activation requirements and unverified restore status are documented in [backup operations](docs/operations/backups.md).
+
+The owner requires Free-only operation. Shared limits require no paid cache or service-role key. Turnstile code is prepared but actual widget/provider activation is still pending; `TURNSTILE_SECRET_KEY` is a private provisioning value for Supabase Auth, not a browser setting. Review [abuse controls and activation](docs/operations/auth-abuse.md) before enabling flags. No paid upgrade is automatic; the guide records future migration options and rollback.
 
 All five operator settings must be present to enable application self-registration. Contact values remain outside Git and client bundles, but are intentionally readable on the public privacy/help pages after deployment. See [public-user operations](docs/operations/deployment.md#public-user-operations) for assisted registration and rights requests.
 
@@ -81,12 +86,13 @@ The schema and authorization rules are versioned in:
 
 1. [`202611080001_public_launch.sql`](supabase/migrations/202611080001_public_launch.sql) — base schema and account isolation.
 2. [`202611080002_manual_covers.sql`](supabase/migrations/202611080002_manual_covers.sql) — provider-independent cover storage and authenticated image-proxy quota.
+3. [`20261116025030_auth_abuse_limits.sql`](supabase/migrations/20261116025030_auth_abuse_limits.sql) — additive private authentication quotas and signed pre-auth RPC; synchronize its generated signing key privately before enabling the web guard.
 
 The initial migration supports a new project or the existing `libros`/`metas_lectura` schema documented by the original project. It is a **one-time migration**, not a script to repeatedly paste into production.
 
 1. Back up the existing database and test the migration on a staging copy.
 2. Inspect legacy rows for duplicate `(user_id, google_books_id)` pairs, orphaned owners, invalid scores/dates and oversized text. Resolve them deliberately before migrating. No records or stored cover URLs are deleted or rewritten to pass validation.
-3. Run both SQL files **in order** in the Supabase SQL Editor as the database owner. If the original 001 failed on `libros_values_valid`, issue `ROLLBACK`, retry the corrected 001 from this revision, then run 002. If 001 already completed successfully, run only 002. Alternatively, apply it using your established Supabase CLI migration workflow. Project configuration is in `supabase/config.toml`, with local CLI linkage stored under the ignored `supabase/.temp/` directory.
+3. Apply the first two schema files **in order** as the database owner, following the failed-transaction and already-applied precautions in the [deployment guide](docs/operations/deployment.md). Apply the additive authentication-limit migration once, then synchronize its signing key privately before enabling the guard. Inspect actual migration history before any general CLI push; the existing deployment includes manually applied baseline schema. Project configuration is in `supabase/config.toml`, with local CLI linkage stored under ignored `supabase/.temp/`.
 4. Confirm the transaction committed successfully and the new policies, constraints and `consume_book_search()` function exist.
 5. Deploy the matching application code **after** the migration.
 6. Test with two real accounts and an anonymous client as described in the [deployment guide](docs/operations/deployment.md).

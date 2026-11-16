@@ -6,6 +6,8 @@ November 14 follow-up: public Spanish notices, separate registration controls, a
 
 The later [sixteen-control security assessment](hardening-roadmap.md) refreshes live database/advisor/firewall/HTTP evidence and defines prioritized implementation. It confirms owner-only forced RLS but adds review of privileged helper execution, explicit cookie hardening, provider-enforced CAPTCHA, shared authentication limits and verified backup/restore operations. No provider security setting was changed by that assessment.
 
+November 15 implementation now includes hardened server-owned cookies and [signed Free-plan authentication quotas](../operations/auth-abuse.md), with pseudonymous temporary counters in three new private tables. The additive migration is live; matching web guards and Turnstile-ready forms await publication/activation. Conditional Spanish privacy copy describes Cloudflare and counter processing. Real CAPTCHA enforcement and backup/restore remain unverified; known unrelated advisor findings are not closed. See the operations guide for deliberate pre-auth RPC grants and activity-driven expiry cleanup.
+
 The operator confirmed their identity and contact details, Colombia as the initial market, and an intended audience older than 14. Actual operator details belong in server-only environment settings and are excluded from versioned documentation. The [internal English legal drafts](../legal/drafts.md) use field references and identify the approved user-facing documents as future Spanish copy. Retention, processor arrangements and the adolescent authorization workflow still need completion.
 
 ## Data and recipients

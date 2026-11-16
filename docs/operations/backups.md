@@ -2,6 +2,8 @@
 
 Status checked November 15, 2026. The connected Supabase organization reports `plan=free` and `tier=tier_free`. The [provider backup documentation](https://supabase.com/docs/guides/platform/backups) documents daily recoverable backups for eligible paid plans and recommends off-site dumps for Free. No paid plan/add-on was activated.
 
+Current owner decision: remain on Free and introduce no charges. Use an external encrypted copy destination within an existing/free arrangement, with verified capacity, retention and restore tests before activation. Reaching a quota must produce a visible failure/alert rather than an automatic paid upgrade. Paid managed backups/PITR are a future migration option only after a separate decision; they are not the current implementation path. Database connection/storage credentials and a restore drill remain pending. The later authentication migration is limited to new, reversible quota objects; it does not modify existing library/account data or complete this backup gate.
+
 The current connector exposes project/organization metadata, SQL and advisors, but no backup-list/backup-schedule operation. The isolated dashboard browser reached the provider sign-in screen, rather than an authenticated backup inventory. Local configuration contains no Management access token or direct database connection. Authorization to perform the work is already given; those missing credentials are an independent access requirement, not another approval request. We cannot treat a healthy database or the Free plan as proof that any specific backup exists or can be restored.
 
 ## Safe inventory command

@@ -4,6 +4,8 @@ Assessed November 14, 2026 (America/Bogota), against repository revision `93006f
 
 Implementation follow-up, November 15: [server-owned cookie hardening](../operations/session-security.md) is implemented and passed actual local-HTTPS/real-provider login, refresh and logout checks. [Backup verification](../operations/backups.md) confirms the organization is Free and adds a safe inventory command; it is blocked without private Management credentials, and no backup/restore has been verified. Database migrations, CAPTCHA, shared attempt limits and full CSP remain pending. The matrix below preserves the original assessment rather than marking the entire roadmap complete.
 
+Later November 15 implementation: [signed shared attempt limits and Turnstile-ready forms](../operations/auth-abuse.md) are implemented and tested. The additive limit migration and matching private settings are applied/prepared, while web release and actual Turnstile widget/provider enforcement remain pending. Existing-data/helper-permission migrations and verified backups remain open. The owner requires Free-only operation and no new charges; paid services are future options only after a separate decision. The original assessment matrix is historical, not the current activation checklist.
+
 ## Evidence and limits
 
 - Inspected authentication actions, session/proxy handling, private layout/API routes, validators, owner-scoped queries, migrations, headers, error boundaries and CI workflows. No application admin UI, client-side Supabase Auth client, raw HTML rendering or app debug endpoint was found in the reviewed source.
