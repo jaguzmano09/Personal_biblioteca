@@ -2,6 +2,8 @@
 
 Assessed November 14, 2026 (America/Bogota), against repository revision `93006f1`, live read-only Supabase metadata/advisors, Vercel's active firewall configuration and anonymous HTTPS responses from the canonical production origin. This increment implements the assessment and roadmap, not the security controls listed as pending.
 
+Implementation follow-up, November 15: [server-owned cookie hardening](../operations/session-security.md) is implemented and passed actual local-HTTPS/real-provider login, refresh and logout checks. [Backup verification](../operations/backups.md) confirms the organization is Free and adds a safe inventory command; it is blocked without private Management credentials, and no backup/restore has been verified. Database migrations, CAPTCHA, shared attempt limits and full CSP remain pending. The matrix below preserves the original assessment rather than marking the entire roadmap complete.
+
 ## Evidence and limits
 
 - Inspected authentication actions, session/proxy handling, private layout/API routes, validators, owner-scoped queries, migrations, headers, error boundaries and CI workflows. No application admin UI, client-side Supabase Auth client, raw HTML rendering or app debug endpoint was found in the reviewed source.

@@ -7,7 +7,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "test:smoke": "node tests/smoke.mjs"
+    "test:smoke": "node tests/smoke.mjs",
+    "security:backups": "node scripts/check-backups.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.6",

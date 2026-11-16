@@ -69,6 +69,10 @@ All settings used by this application are **server-only**. Do not add `NEXT_PUBL
 
 Never use `service_role` or an `sb_secret_` key in this application. Privileged keys can bypass RLS. Configuration rejects known privileged key formats. HTTP is accepted for `SITE_URL` only on localhost/127.0.0.1.
 
+Session and PKCE cookies use a shared server-owned HttpOnly/Secure/Lax policy, with Secure determined by the validated HTTPS origin and a localhost HTTP exception. See [session rollout and verification](docs/operations/session-security.md).
+
+Optional `npm run security:backups` reads provider backup inventory using a privately configured Management token. Its `SUPABASE_ACCESS_TOKEN`/optional `SUPABASE_PROJECT_REF` settings are for local operations, not the web application or its deployment. The current Free-plan backup activation requirements and unverified restore status are documented in [backup operations](docs/operations/backups.md).
+
 All five operator settings must be present to enable application self-registration. Contact values remain outside Git and client bundles, but are intentionally readable on the public privacy/help pages after deployment. See [public-user operations](docs/operations/deployment.md#public-user-operations) for assisted registration and rights requests.
 
 ## Database setup and migration

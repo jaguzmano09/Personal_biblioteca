@@ -23,6 +23,13 @@ The owner previously published the dashboard commits. The last verified web prod
 
 ## Change record
 
+### November 15, 2026 — Backup access verification and safe inventory tooling
+
+- Confirmed through connected organization metadata that the project is on Supabase Free. The provider documents daily recoverable backups for eligible paid plans and external dumps for Free; no paid service or add-on was activated. The backup dashboard required sign-in, and the connector has no backup inventory operation. No direct Postgres/Management/Turnstile credentials were available locally. Existing authorization does not provide those missing credentials.
+- Added `npm run security:backups`, a read-only Management inventory command with a fixed HTTPS host, project validation, redirect denial, timeout and allowlisted/redacted output. The actual run reports `blocked / missing_management_token`; tests ensure private provider errors/signed links cannot be emitted. The command does not create copies, modify schedules or certify restoration.
+- Documented the exact activation gate in [backup operations](../operations/backups.md): private connection, defined private destination/retention, encryption/key custody, scheduled execution and isolated restoration. No production database migration, encrypted backup, automatic copy job or restore was performed. CAPTCHA/shared login limits and the remaining roadmap are still pending.
+- Verification: 45 tests passed; TypeScript/build/smoke passed for this working tree. Documentation checks passed 50 local links across 15 Markdown files; exposure checks covered 120 versionable files and 49 built client files with zero findings. Cookie implementation commit: `f1b1115`. Tooling/documentation commit: `chore(backup): add safe provider inventory checks`. Both local on `main`, without push/deployment.
+
 ### November 15, 2026 — Server-owned session-cookie hardening
 
 - Implemented one shared cookie policy for the server client and proxy: HttpOnly, Secure for validated HTTPS origins, SameSite=Lax, root path and host-only scope. Local HTTP remains limited to localhost/127.0.0.1. Preserved SDK cookie names, PKCE, chunking, refresh and deletion semantics; no browser token client/storage was introduced.
