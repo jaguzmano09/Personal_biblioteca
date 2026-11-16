@@ -6,8 +6,13 @@ import { credentials, ValidationError } from './validation'
 import { redirect } from 'next/navigation'
 import { registrationConsent } from './registration'
 import { operatorConfig } from './operator-config'
+import { guardAuthAttempt } from './auth-security'
 
-export async function iniciarSesion(email: string, password: string) {
+export async function iniciarSesion(
+  email: string,
+  password: string,
+  captchaToken?: string
+) {
   let input
   try {
     input = credentials(email, password)
@@ -15,7 +20,12 @@ export async function iniciarSesion(email: string, password: string) {
     return { error: 'Revisa el correo y la contraseña.' }
   }
   const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword(input)
+  const guard = await guardAuthAttempt(supabase, input.email, 'login', captchaToken)
+  if (guard.error) return { error: guard.error }
+  const { error } = await supabase.auth.signInWithPassword({
+    ...input,
+    options: { captchaToken: guard.captchaToken }
+  })
   if (error)
     return {
       error:
@@ -27,7 +37,8 @@ export async function iniciarSesion(email: string, password: string) {
 export async function registrarUsuario(
   email: string,
   password: string,
-  consent: unknown
+  consent: unknown,
+  captchaToken?: string
 ) {
   if (!operatorConfig().ready)
     return {
@@ -54,9 +65,12 @@ export async function registrarUsuario(
     }
   }
   const supabase = await createClient()
+  const guard = await guardAuthAttempt(supabase, input.email, 'signup', captchaToken)
+  if (guard.error) return { error: guard.error }
   const { error } = await supabase.auth.signUp({
     ...input,
     options: {
+      captchaToken: guard.captchaToken,
       emailRedirectTo: `${siteOrigin()}/api/auth/callback`,
       data: { registration_acceptance: acceptance }
     }
@@ -69,7 +83,8 @@ export async function registrarUsuario(
 
 export async function solicitarCorreo(
   email: string,
-  kind: 'recovery' | 'confirmation'
+  kind: 'recovery' | 'confirmation',
+  captchaToken?: string
 ) {
   let normalized
   try {
@@ -80,16 +95,22 @@ export async function solicitarCorreo(
   if (!['recovery', 'confirmation'].includes(kind))
     return { error: 'Solicitud inválida.' }
   const supabase = await createClient()
+  const guard = await guardAuthAttempt(supabase, normalized, kind, captchaToken)
+  if (guard.error) return { error: guard.error }
   try {
     if (kind === 'recovery') {
       await supabase.auth.resetPasswordForEmail(normalized, {
+        captchaToken: guard.captchaToken,
         redirectTo: `${siteOrigin()}/api/auth/callback?flow=recovery`
       })
     } else {
       await supabase.auth.resend({
         type: 'signup',
         email: normalized,
-        options: { emailRedirectTo: `${siteOrigin()}/api/auth/callback` }
+        options: {
+          emailRedirectTo: `${siteOrigin()}/api/auth/callback`,
+          captchaToken: guard.captchaToken
+        }
       })
     }
   } catch {
@@ -104,8 +125,7 @@ export async function actualizarClave(password: string, confirmation: string) {
   } catch {
     return { error: 'Usa una contraseña de 12 a 128 caracteres.' }
   }
-  if (password !== confirmation)
-    return { error: 'Las contraseñas no coinciden.' }
+  if (password !== confirmation) return { error: 'Las contraseñas no coinciden.' }
   const supabase = await createClient()
   const {
     data: { user },
@@ -113,8 +133,7 @@ export async function actualizarClave(password: string, confirmation: string) {
   } = await supabase.auth.getUser()
   if (sessionError || !user)
     return {
-      error:
-        'El enlace ya no permite cambiar la contraseña. Solicita uno nuevo.'
+      error: 'El enlace ya no permite cambiar la contraseña. Solicita uno nuevo.'
     }
   const { error } = await supabase.auth.updateUser({ password })
   if (error)

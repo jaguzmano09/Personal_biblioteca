@@ -6,6 +6,7 @@ import { registrationConsent, NOTICE_VERSION } from '../src/lib/registration.ts'
 let dependencies: {
   auth: Record<string, (...args: any[]) => any>
   ready: boolean
+  guard?: { error?: string; captchaToken?: string }
 }
 Object.defineProperty(globalThis, '__tinterunaAuthTest', {
   get: () => dependencies,
@@ -17,8 +18,7 @@ const hooks = registerHooks({
     if (context.parentURL === actionUrl) {
       if (specifier === './validation' || specifier === './registration')
         return {
-          url: new URL(`../src/lib/${specifier.slice(2)}.ts`, import.meta.url)
-            .href,
+          url: new URL(`../src/lib/${specifier.slice(2)}.ts`, import.meta.url).href,
           shortCircuit: true
         }
       let source: string | null = null
@@ -30,9 +30,11 @@ const hooks = registerHooks({
       if (specifier === './operator-config')
         source =
           'export function operatorConfig(){return {ready:globalThis.__tinterunaAuthTest.ready}}'
-      if (specifier === 'next/navigation')
+      if (specifier === './auth-security')
         source =
-          'export function redirect(path){throw new Error("REDIRECT "+path)}'
+          'export async function guardAuthAttempt(){return globalThis.__tinterunaAuthTest.guard ?? {}}'
+      if (specifier === 'next/navigation')
+        source = 'export function redirect(path){throw new Error("REDIRECT "+path)}'
       if (source)
         return {
           url: `data:text/javascript,${encodeURIComponent(source)}`,
@@ -49,15 +51,20 @@ after(() => Reflect.deleteProperty(globalThis, '__tinterunaAuthTest'))
 function setup() {
   const calls: { method: string; args: any[] }[] = []
   const auth = Object.fromEntries(
-    ['resetPasswordForEmail', 'resend', 'updateUser', 'signOut', 'signUp'].map(
-      method => [
-        method,
-        async (...args: any[]) => {
-          calls.push({ method, args })
-          return { error: null }
-        }
-      ]
-    )
+    [
+      'signInWithPassword',
+      'resetPasswordForEmail',
+      'resend',
+      'updateUser',
+      'signOut',
+      'signUp'
+    ].map(method => [
+      method,
+      async (...args: any[]) => {
+        calls.push({ method, args })
+        return { error: null }
+      }
+    ])
   )
   dependencies = {
     ready: true,
@@ -71,10 +78,7 @@ function setup() {
 
 test('email recovery and confirmation use fixed destinations and non-enumerating responses', async () => {
   const calls = setup()
-  const recovery = await actions.solicitarCorreo(
-    ' reader@example.test ',
-    'recovery'
-  )
+  const recovery = await actions.solicitarCorreo(' reader@example.test ', 'recovery')
   assert.equal(calls[0].args[0], 'reader@example.test')
   assert.equal(
     calls[0].args[1].redirectTo,
@@ -103,6 +107,56 @@ test('email recovery and confirmation use fixed destinations and non-enumerating
   assert.ok((await actions.solicitarCorreo('invalid', 'recovery')).error)
 })
 
+test('all access actions stop on guard denial and forward the token only to Auth', async () => {
+  const calls = setup()
+  const consent = {
+    age: 'adult',
+    terms: true,
+    privacy: true,
+    version: NOTICE_VERSION
+  }
+  dependencies.guard = { error: 'Limited' }
+  assert.deepEqual(
+    await actions.iniciarSesion('reader@example.test', 'password', 'token'),
+    { error: 'Limited' }
+  )
+  assert.deepEqual(
+    await actions.registrarUsuario(
+      'reader@example.test',
+      'a-strong-password',
+      consent,
+      'token'
+    ),
+    { error: 'Limited' }
+  )
+  assert.deepEqual(
+    await actions.solicitarCorreo('reader@example.test', 'recovery', 'token'),
+    { error: 'Limited' }
+  )
+  assert.deepEqual(
+    await actions.solicitarCorreo('reader@example.test', 'confirmation', 'token'),
+    { error: 'Limited' }
+  )
+  assert.equal(calls.length, 0)
+  dependencies.guard = { captchaToken: 'one-use-token' }
+  await assert.rejects(
+    actions.iniciarSesion('reader@example.test', 'password', 'token'),
+    /REDIRECT/
+  )
+  await actions.registrarUsuario(
+    'reader@example.test',
+    'a-strong-password',
+    consent,
+    'token'
+  )
+  await actions.solicitarCorreo('reader@example.test', 'recovery', 'token')
+  await actions.solicitarCorreo('reader@example.test', 'confirmation', 'token')
+  assert.equal(calls[0].args[0].options.captchaToken, 'one-use-token')
+  assert.equal(calls[1].args[0].options.captchaToken, 'one-use-token')
+  assert.equal(calls[2].args[1].captchaToken, 'one-use-token')
+  assert.equal(calls[3].args[0].options.captchaToken, 'one-use-token')
+})
+
 test('password updates require matching strong credentials and a server-validated user', async () => {
   const calls = setup()
   assert.ok((await actions.actualizarClave('short', 'short')).error)
@@ -115,12 +169,8 @@ test('password updates require matching strong credentials and a server-validate
     error: null
   })
   assert.ok(
-    (
-      await actions.actualizarClave(
-        'a-strong-new-password',
-        'a-strong-new-password'
-      )
-    ).error
+    (await actions.actualizarClave('a-strong-new-password', 'a-strong-new-password'))
+      .error
   )
   assert.equal(calls.length, 0)
   setup()

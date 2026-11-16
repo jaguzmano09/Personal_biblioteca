@@ -23,6 +23,13 @@ The owner previously published the dashboard commits. The last verified web prod
 
 ## Change record
 
+### November 15, 2026 — Guarded access actions and provider token forwarding
+
+- Applied shared pre-auth checks to login, adult signup, recovery and confirmation resend before their provider operations. Explicit enabled infrastructure/configuration failures deny requests; account-independent mail feedback and fixed callback destinations remain intact. Password changes still require their existing verified session.
+- Added private feature configuration and optional CAPTCHA parameters to the existing action contracts. Supported tokens are forwarded once to Supabase Auth for provider verification, without a duplicate local Siteverify redemption. Required missing/oversized tokens and public production test keys are rejected; only the public site key can reach client props.
+- Action/guard tests verify denials stop provider calls, all four operations forward tokens, private diagnostics/identifiers stay out of public results, configuration errors fail closed and disabled flags preserve staged rollout. The actual local production login with real Supabase denied the sixth synthetic failed attempt and preserved input; no account or email was created and exact test counters/nonces were removed.
+- Verification passed the full 54-test working tree, TypeScript/build/smoke and the live limiter checks. Backend migration commit: `2abde93`; operations documentation: `06bc23c`. Commit: `feat(auth): guard access requests before provider calls`. Local on `main`; production web enforcement awaits publication, and real CAPTCHA activation is still pending.
+
 ### November 15, 2026 — Free shared authentication quotas
 
 - Implemented and applied additive migration `20261116025030_auth_abuse_limits.sql`: private configuration, expiring quota/nonces and a signed pre-auth RPC. No existing accounts, library rows, policies or roles were rewritten. The generated local migration filename was aligned with the provider's applied migration version. Existing-data/privilege changes still require the separate backup gate.
