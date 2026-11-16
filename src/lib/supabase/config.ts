@@ -1,3 +1,15 @@
+import type { CookieOptions } from '@supabase/ssr'
+
+// Auth and PKCE stay on the server. Preserve SDK expiry/deletion semantics.
+export function sessionCookieOptions(): CookieOptions {
+  return {
+    httpOnly: true,
+    secure: new URL(siteOrigin()).protocol === 'https:',
+    sameSite: 'lax',
+    path: '/',
+  }
+}
+
 export function supabaseConfig() {
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_ANON_KEY

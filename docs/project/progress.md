@@ -1,6 +1,6 @@
 # Platform progress
 
-Last updated on November 14, 2026. This is the current working record for Tinteruna. Update it with each completed increment, including changes, evidence, open work and publication status.
+Last updated on November 15, 2026. This is the current working record for Tinteruna. Update it with each completed increment, including changes, evidence, open work and publication status.
 
 ## Current state
 
@@ -22,6 +22,14 @@ Tinteruna is a private reading journal with a Spanish interface, editorial typog
 The owner previously published the dashboard commits. The last verified web production revision is READY `b0894f7`; the first-reader review exercised that live version. The eight reviewed findings now have application corrections committed locally on `main`, without a push or web deployment in this increment. The canonical-origin rule remains active. Five encrypted Vercel production operator settings were saved and the backward-compatible recovery mail hook is active as version 13. The next web deployment must activate the code/settings, followed by public contact, redirect-allowlist, actual email delivery and recovery/confirmation-link acceptance checks. Local real-provider testing does not establish that those production paths have passed.
 
 ## Change record
+
+### November 15, 2026 — Server-owned session-cookie hardening
+
+- Implemented one shared cookie policy for the server client and proxy: HttpOnly, Secure for validated HTTPS origins, SameSite=Lax, root path and host-only scope. Local HTTP remains limited to localhost/127.0.0.1. Preserved SDK cookie names, PKCE, chunking, refresh and deletion semantics; no browser token client/storage was introduced.
+- Added installed-SDK regression coverage for remote HTTPS/local development, invalid origins, PKCE exchange, session chunks, user retrieval, refresh and removal. A local production build over temporary HTTPS with an isolated real Supabase account verified actual flags, no JavaScript token access, reload/export, forced proxy renewal, logout cookie removal and anonymous denial. Invalid recovery links remain safe; real email delivery/link consumption is still unverified.
+- The account and all its records/sessions were removed; follow-up counts were zero with the original two accounts retained. Temporary credentials/TLS keys and test browsers/servers were removed/closed. Build/TypeScript and smoke passed after retrying the blocked font network download and rerunning smoke after the successful build. The complete suite, including backup-readiness tests, passed 45 tests.
+- Applied Supabase, Vercel environment, agent-browser and webapp-testing guidance. See [session operations](../operations/session-security.md) for rollout and verification limits. Existing browser cookies acquire new flags when rewritten by login/refresh; no production web publication was performed.
+- Commit: `fix(auth): harden server-owned session cookies`. Local on `main`; database/provider security configuration remains unchanged.
 
 ### November 14, 2026 — Sixteen-control security assessment and roadmap
 
