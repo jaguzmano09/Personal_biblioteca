@@ -23,6 +23,14 @@ The owner previously published the dashboard commits. The last verified web prod
 
 ## Change record
 
+### November 15, 2026 — Free shared authentication quotas
+
+- Implemented and applied additive migration `20261116025030_auth_abuse_limits.sql`: private configuration, expiring quota/nonces and a signed pre-auth RPC. No existing accounts, library rows, policies or roles were rewritten. The generated local migration filename was aligned with the provider's applied migration version. Existing-data/privilege changes still require the separate backup gate.
+- Web-generated HMAC proofs bind action, pseudonymous IP/account identifiers, timestamp and one-use nonce. Only trusted Vercel ingress is accepted outside localhost; mapped IPv4 and IPv6 /64 normalize. Atomic IP/pair/recipient windows prevent arbitrary anonymous bucket writes, replay and a permanent cross-IP account login lockout. See [authentication operations](../operations/auth-abuse.md) for thresholds and limitations.
+- Isolated PostgreSQL tests cover signature tampering, expiry/replay, direct table/helper denial, window reset, mail budgets and IP caps. Live anonymous RPC checks allowed five attempts, rejected the sixth, allowed another IP and rejected replay/forgery. Synthetic quota rows/nonces were removed. Post-migration advisors include intentional private-table/no-policy and signed pre-auth EXECUTE findings; older unrelated findings remain open.
+- Matched signing configuration saved in ignored local settings and encrypted Vercel production variables, with the limiter flag prepared for the next web release. No service-role key, paid store or WAF subscription was introduced. Full working-tree verification passed 54 tests, TypeScript/build/smoke and fixture browser checks; web publication is still pending.
+- Commit: `feat(security): add signed authentication attempt quotas`. Local on `main`; the new database objects are active, while user-facing enforcement awaits the web commits.
+
 ### November 15, 2026 — Backup access verification and safe inventory tooling
 
 - Confirmed through connected organization metadata that the project is on Supabase Free. The provider documents daily recoverable backups for eligible paid plans and external dumps for Free; no paid service or add-on was activated. The backup dashboard required sign-in, and the connector has no backup inventory operation. No direct Postgres/Management/Turnstile credentials were available locally. Existing authorization does not provide those missing credentials.
